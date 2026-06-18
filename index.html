@@ -96,7 +96,7 @@
      Por defecto están ocultas (display:none); la que tiene la clase
      "active" es la que se muestra. La función showScreen() (en JS) controla esto.
      ========================================================================== */
-  .screen { display:none; min-height:100vh; min-height:100dvh; width:100%; flex-direction:column; align-items:center; justify-content:center; padding: clamp(1rem, 3vw, 2.5rem); }
+  .screen { display:none; min-height:100vh; min-height:100dvh; width:100%; flex-direction:column; align-items:center; justify-content:center; padding: clamp(1rem, 3vw, 2.5rem); overflow-y:auto; }
   .screen.active { display:flex; }
 
   /* ===== HOME SCREEN (Pantalla de inicio) =====
@@ -553,6 +553,35 @@
     .timer-options .chip { width:100%; justify-content:center; }
     .selector-topbar { gap:0.5rem; }
     .selector-topbar span[aria-hidden] { display:none; }
+  }
+
+  /* ==========================================================================
+     RESPONSIVE: TABLETS HORIZONTALES DE POCA ALTURA (ej. Samsung Tab E 9.6"
+     1280x800). En orientación horizontal, la altura disponible real (tras la
+     barra del navegador) suele ser ~700-760px. Sin este ajuste, el emoji
+     grande + slots + letras + botones no entran en la pantalla y se cortan
+     o generan scroll. Aquí se compacta todo verticalmente: menos gaps, menos
+     paddings y elementos más pequeños, para que la vista del juego completa
+     (letras incluidas) se vea sin necesidad de hacer scroll.
+     Se activa solo en horizontal (landscape) con poca altura.
+     ========================================================================== */
+  @media (orientation: landscape) and (max-height: 800px) {
+    .screen { padding: 0.6rem clamp(1rem, 2vw, 1.6rem); justify-content:flex-start; }
+    #game .container-responsive { justify-content:flex-start; padding-top:0.3rem; }
+    .game-header { margin-bottom:0.6rem; padding-left: clamp(40px, 5vw, 56px); }
+    .game-area { gap: clamp(0.6rem, 1.4vw, 1.1rem); }
+    .nav-home-fab { width:36px; height:36px; font-size:1rem; top:0.5rem; left:0.5rem; }
+    .emoji-frame { width: clamp(90px, 13vw, 150px); height: clamp(90px, 13vw, 150px); border-width: clamp(4px,0.6vw,8px); }
+    .word-emoji { font-size: clamp(3rem, 7vw, 5.5rem); }
+    .slots { gap: clamp(0.35rem, 0.8vw, 0.7rem); max-width:980px; }
+    .slot { width: clamp(40px, 6vw, 64px); height: clamp(46px, 7vw, 72px); font-size: clamp(1.4rem, 2.6vw, 2.2rem); border-width: clamp(2px,0.3vw,3px); }
+    .letters { gap: clamp(0.4rem, 0.9vw, 0.8rem); max-width:980px; }
+    .letter-btn { width: clamp(40px, 6vw, 64px); height: clamp(40px, 6vw, 64px); font-size: clamp(1.3rem, 2.4vw, 2.1rem); }
+    .hint-row { gap:0.6rem; }
+    .hint-btn, .clear-btn { padding: 0.4rem 1rem; font-size: clamp(0.75rem, 1vw, 0.95rem); min-height:36px; }
+    .game-nav { margin-top: clamp(0.5rem, 1.4vw, 1rem); gap: clamp(0.8rem, 2vw, 1.6rem); }
+    .nav-arrow-btn { width: clamp(34px, 4.5vw, 44px); height: clamp(34px, 4.5vw, 44px); font-size: clamp(1rem, 1.6vw, 1.3rem); }
+    .forest-tree, .forest-flower { transform: scale(0.7); }
   }
 
   /* Pantallas muy pequeñas: reduce un poco más el tamaño de slots/letras */
