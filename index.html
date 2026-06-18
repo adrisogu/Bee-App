@@ -333,12 +333,7 @@
   .letter-btn:disabled { opacity:0.2; transform:none; cursor:default; box-shadow:none; } /* Letra ya usada (colocada en un slot) */
   .letter-btn:active:not(:disabled) { transform:translateY(2px); box-shadow: 0 2px 0 0 var(--honey-dark); }
 
-  /* --- Botones de Pista (Hint) y Limpiar (Clear) --- */
-  .hint-row { display:flex; align-items:center; justify-content:center; gap: clamp(0.6rem, 1.5vw, 1.5rem); flex-wrap:wrap; }
-  .hint-btn { background:var(--blue-light); color: var(--blue); border:none; border-radius:50px; padding: clamp(0.5rem,1vw,0.9rem) clamp(1.1rem,2vw,1.8rem); font-size: clamp(0.85rem, 1.1vw, 1.2rem); font-weight:700; cursor:pointer; transition:all 0.18s; min-height:48px; }
-  .hint-btn:hover { background: var(--blue); color:#fff; }
-  .clear-btn { background:var(--orange-light); color: var(--orange); border:none; border-radius:50px; padding: clamp(0.5rem,1vw,0.9rem) clamp(1.1rem,2vw,1.8rem); font-size: clamp(0.85rem, 1.1vw, 1.2rem); font-weight:700; cursor:pointer; transition:all 0.18s; min-height:48px; }
-  .clear-btn:hover { background: var(--orange); color:#fff; }
+  /* --- (Botones de Pista y Limpiar eliminados) --- */
 
   /* --- Navegación inferior del juego: flecha Prev (roja) y flecha Next (verde) --- */
   .game-nav { width:100%; max-width:1400px; display:flex; justify-content:center; align-items:center; margin-top: clamp(1.5rem,3vw,3rem); gap: clamp(1rem,3vw,2.5rem); }
@@ -537,9 +532,7 @@
     .admin-header .nav-btn, .selector-topbar .back-btn { width:auto; flex:none; } /* Estos botones NO se estiran */
     .chip-group { flex-direction:column; align-items:stretch; }
     .chip { justify-content:center; text-align:center; width:100%; }
-    .game-nav .nav-btn, .hint-row .hint-btn, .hint-row .clear-btn { width:auto; }
-    .hint-row { width:100%; }
-    .hint-row .hint-btn, .hint-row .clear-btn { flex:1; }
+    .game-nav .nav-btn { width:auto; }
     .form-row { flex-direction:column; align-items:stretch; }
     .emoji-input { width:100%; }
     #admin .container-responsive .form-row #newCat { width:100%; }
@@ -577,8 +570,6 @@
     .slot { width: clamp(40px, 6vw, 64px); height: clamp(46px, 7vw, 72px); font-size: clamp(1.4rem, 2.6vw, 2.2rem); border-width: clamp(2px,0.3vw,3px); }
     .letters { gap: clamp(0.4rem, 0.9vw, 0.8rem); max-width:980px; }
     .letter-btn { width: clamp(40px, 6vw, 64px); height: clamp(40px, 6vw, 64px); font-size: clamp(1.3rem, 2.4vw, 2.1rem); }
-    .hint-row { gap:0.6rem; }
-    .hint-btn, .clear-btn { padding: 0.4rem 1rem; font-size: clamp(0.75rem, 1vw, 0.95rem); min-height:36px; }
     .game-nav { margin-top: clamp(0.5rem, 1.4vw, 1rem); gap: clamp(0.8rem, 2vw, 1.6rem); }
     .nav-arrow-btn { width: clamp(34px, 4.5vw, 44px); height: clamp(34px, 4.5vw, 44px); font-size: clamp(1rem, 1.6vw, 1.3rem); }
     .forest-tree, .forest-flower { transform: scale(0.7); }
@@ -826,10 +817,6 @@
       </div>
       <!-- Los espacios vacíos para armar la palabra se generan dinámicamente (loadWord) -->
       <div class="slots" id="slots"></div>
-      <div class="hint-row">
-        <button class="hint-btn" onclick="useHint()">💡 Hint</button>
-        <button class="clear-btn" onclick="clearAll()">🔄 Clear</button>
-      </div>
       <!-- Las letras desordenadas (botones) se generan dinámicamente (loadWord) -->
       <div class="letters" id="letters"></div>
     </div>
@@ -1365,18 +1352,7 @@ function checkAnswer() {
   }
 }
 
-function useHint() {
-  hintUsed = true;
-  const w = gameWords[gameIdx];
-  const letters = w.word.replace(/\s/g,'').split('');
-  for(let i=0;i<currentSlots.length;i++){
-    if(!currentSlots[i]) {
-      const needed = letters[i];
-      const btn = [...document.querySelectorAll('.letter-btn:not(:disabled)')].find(b=>b.textContent===needed);
-      if(btn) { placeLetter(btn, needed); break; }
-    }
-  }
-}
+// (Función useHint eliminada junto con el botón "Hint")
 
 function showSuccess(wordObj, earnedStars) {
   const msgs = SUCCESS_MSGS;
