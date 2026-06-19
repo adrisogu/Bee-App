@@ -734,6 +734,28 @@
       </div>
     </div>
 
+    <!-- Tarjeta 3: Cantidad de palabras a practicar -->
+    <div class="selector-card">
+      <div class="selector-section">
+        <div class="timer-row">
+          <span class="timer-row-label">📝 Word Count</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="wordCountCustomEnabled" onchange="onWordCountToggle()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <!-- Texto informativo: muestra cuántas palabras hay disponibles con los filtros actuales -->
+        <div id="wordCountInfo" style="margin-top:0.75rem; font-size:clamp(0.85rem,1vw,1.05rem); color:var(--text-muted);">
+          All available words will be used
+        </div>
+        <!-- Campo custom: solo visible si el toggle está activo -->
+        <div class="timer-custom-row hidden" id="wordCountCustomRow">
+          <input type="number" id="wordCountCustomValue" min="1" max="999" value="10" aria-label="Number of words">
+          <span>words</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Botón para iniciar la partida con la configuración elegida (función startGame) -->
     <button class="btn btn-primary" onclick="startGame()" style="margin-top:0.5rem">🐝 Play!</button>
   </div>
@@ -1015,7 +1037,7 @@ const DEFAULT_WORDS = [
   {emoji:'🧢', word:'CAP', cat:'Camila'},
   {emoji:'🐀', word:'RAT', cat:'Camila'},
   {emoji:'🎒', word:'BAG', cat:'Camila'},
-  {emoji:'🪭', word:'FAN', cat:'Camila'},
+  {emoji:'🌀', word:'FAN', cat:'Camila'},
   {emoji:'🍳', word:'PAN', cat:'Camila'},
   {emoji:'🚐', word:'VAN', cat:'Camila'},
   {emoji:'👨', word:'DAD', cat:'Camila'},
@@ -1026,7 +1048,7 @@ const DEFAULT_WORDS = [
   {emoji:'🖊️', word:'PEN', cat:'Camila'},
   {emoji:'🥅', word:'NET', cat:'Camila'},
   {emoji:'🦵', word:'LEG', cat:'Camila'},
-  {emoji:'☔', word:'WET', cat:'Camila'},
+  {emoji:'💧', word:'WET', cat:'Camila'},
   {emoji:'🐔', word:'HEN', cat:'Camila'},
   {emoji:'🔟', word:'TEN', cat:'Camila'},
   {emoji:'✈️', word:'JET', cat:'Camila'},
@@ -1038,12 +1060,12 @@ const DEFAULT_WORDS = [
   {emoji:'👄', word:'LIP', cat:'Camila'},
   {emoji:'📌', word:'PIN', cat:'Camila'},
   {emoji:'🐶', word:'DOG', cat:'Camila'},
-  {emoji:'🔥', word:'HOT', cat:'Camila'},
+  {emoji:'☀️', word:'HOT', cat:'Camila'},
   {emoji:'🦊', word:'FOX', cat:'Camila'},
   {emoji:'👩', word:'MOM', cat:'Camila'},
   {emoji:'📦', word:'BOX', cat:'Camila'},
   {emoji:'🐰', word:'HOP', cat:'Camila'},
-  {emoji:'🧹', word:'MOP', cat:'Camila'},
+  {emoji:'🙂', word:'MOP', cat:'Camila'},
   {emoji:'🍲', word:'POT', cat:'Camila'},
   {emoji:'🐞', word:'BUG', cat:'Camila'},
   {emoji:'🌞', word:'SUN', cat:'Camila'},
@@ -1061,6 +1083,7 @@ let currentSlots = [], selectedCat = 'all', selectedLevel = 'all'; // Letras col
 let wordStartTime = 0, sessionStartTime = 0; // Marcas de tiempo para calcular duración
 let hintUsed = false; // Si ya se usó una pista en la palabra actual
 let timerEnabled = false, timerSeconds = 60, selectedTimerOption = '1'; // Configuración del temporizador
+let wordCountCustomEnabled = false; // Si está activo, usa un número personalizado de palabras
 let timerInterval = null, timeRemaining = 0; // Control del conteo regresivo activo
 
 // ==========================================================================
@@ -1129,11 +1152,12 @@ function showSelector() {
   const cats = ['all', ...new Set(words.map(w=>w.cat))];
   const cc = document.getElementById('catChips');
   cc.innerHTML = cats.map(c=>`<div class="chip ${c==='all'?'selected chip-all':''}" data-cat="${c}" onclick="selectCat(this)">${c==='all'?'⭐ All':c}</div>`).join('');
+  updateWordCountInfo();
 }
 // Se ejecuta al hacer clic en un chip de Categoría: marca el seleccionado y guarda el filtro
-function selectCat(el) { document.querySelectorAll('#catChips .chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedCat=el.dataset.cat; }
+function selectCat(el) { document.querySelectorAll('#catChips .chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedCat=el.dataset.cat; updateWordCountInfo(); }
 // Se ejecuta al hacer clic en un chip de Nivel: marca el seleccionado y guarda el filtro
-function selectLevel(el) { document.querySelectorAll('[data-level]').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedLevel=el.dataset.level; }
+function selectLevel(el) { document.querySelectorAll('[data-level]').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedLevel=el.dataset.level; updateWordCountInfo(); }
 
 // ==========================================================================
 // CONFIGURACIÓN DEL TEMPORIZADOR (pantalla Selector)
@@ -1173,6 +1197,35 @@ function getTimerSeconds() {
 }
 
 // ==========================================================================
+// CANTIDAD DE PALABRAS (pantalla Selector)
+// ==========================================================================
+// Se ejecuta al activar/desactivar el toggle de Word Count.
+function onWordCountToggle() {
+  wordCountCustomEnabled = document.getElementById('wordCountCustomEnabled').checked;
+  const customRow = document.getElementById('wordCountCustomRow');
+  customRow.classList.toggle('hidden', !wordCountCustomEnabled);
+  updateWordCountInfo();
+}
+
+// Actualiza el texto informativo según los filtros y el toggle activo.
+// Se llama desde showSelector() y cuando cambia categoría/nivel.
+function updateWordCountInfo() {
+  const pool = words.filter(w => {
+    const catOk = selectedCat==='all' || w.cat===selectedCat;
+    const lvlOk = selectedLevel==='all' || getLevel(w.word)===selectedLevel;
+    return catOk && lvlOk;
+  });
+  const total = pool.length;
+  const info = document.getElementById('wordCountInfo');
+  if(!info) return;
+  if(wordCountCustomEnabled) {
+    info.textContent = total + ' words available with current filters';
+  } else {
+    info.textContent = 'All ' + total + ' available word' + (total!==1?'s':'') + ' will be used';
+  }
+}
+
+// ==========================================================================
 // LÓGICA DEL JUEGO
 // ==========================================================================
 // Determina el nivel de dificultad de una palabra según su longitud:
@@ -1188,7 +1241,7 @@ function getLevel(word) {
 // Se ejecuta al presionar "Play!" en el selector.
 // 1) Filtra el banco de palabras según Categoría y Nivel elegidos.
 // 2) Si no hay palabras que cumplan, muestra un aviso (toast) y se detiene.
-// 3) Mezcla las palabras y toma hasta 20 para la sesión.
+// 3) Mezcla las palabras y usa todas (o el número custom si está activo).
 // 4) Reinicia los contadores de la sesión (estrellas, aciertos, intentos).
 // 5) Calcula la duración del temporizador y muestra/oculta su badge.
 // 6) Pasa a la pantalla de juego y carga la primera palabra.
@@ -1199,7 +1252,13 @@ function startGame() {
     return catOk && lvlOk;
   });
   if(pool.length===0) { showToast('No words match the filter! Try different settings.'); return; }
-  gameWords = shuffle([...pool]).slice(0, Math.min(20, pool.length));
+  // Si Word Count custom está activo, tomar ese número; si no, usar todas las disponibles
+  let limit = pool.length;
+  if(wordCountCustomEnabled) {
+    const customVal = parseInt(document.getElementById('wordCountCustomValue').value, 10);
+    if(!isNaN(customVal) && customVal > 0) limit = Math.min(customVal, pool.length);
+  }
+  gameWords = shuffle([...pool]).slice(0, limit);
   gameIdx = 0; gameStars = 0; gameCorrectFirst = 0; gameAttempts = 0;
   sessionStartTime = Date.now();
   timerSeconds = getTimerSeconds();
