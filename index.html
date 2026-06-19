@@ -457,6 +457,16 @@
   .select-field { border:2px solid var(--border); border-radius: var(--radius-sm); padding: clamp(0.6rem,1vw,0.9rem) clamp(0.8rem,1.2vw,1.2rem); font-size: clamp(0.9rem, 1.1vw, 1.2rem); background:var(--card); cursor:pointer; min-height:48px; }
   .select-field:focus { border-color: var(--honey); outline:none; }
   /* Mensaje flotante temporal (ej: "Word added!", "Stats reset") */
+  /* Resalta brevemente la palabra recién agregada en la lista */
+  .word-item-new {
+    animation: highlightNew 1.8s ease-out forwards;
+  }
+  @keyframes highlightNew {
+    0%   { background: #E8F5E9; border-color: var(--green); }
+    60%  { background: #E8F5E9; border-color: var(--green); }
+    100% { background: transparent; border-color: var(--border); }
+  }
+
   .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:#fff; border-radius:50px; padding: clamp(0.7rem,1vw,1rem) clamp(1.2rem,2vw,2rem); font-size: clamp(0.9rem, 1vw, 1.1rem); font-weight:600; z-index:200; transition:transform 0.3s; max-width:90vw; text-align:center; }
   .toast.show { transform:translateX(-50%) translateY(0); }
 
@@ -879,13 +889,8 @@
               <!-- Para agregar una nueva categoría disponible al crear palabras manualmente,
                    agrega una nueva <option> aquí -->
               <select class="select-field" id="newCat">
-                <option value="Animals">🐾 Animals</option>
-                <option value="Food">🍎 Food</option>
-                <option value="Vehicles">🚗 Vehicles</option>
-                <option value="School">🎒 School</option>
-                <option value="Colors">🎨 Colors</option>
-                <option value="Nature">🌿 Nature</option>
-                <option value="Other">📦 Other</option>
+                <option value="Camila">👧 Camila</option>
+                <option value="Sebas">👦 Sebastian</option>
               </select>
             </div>
             <button class="btn btn-success btn-sm" onclick="addWord()" style="width:100%">Add Word</button>
@@ -1004,16 +1009,46 @@ const SUCCESS_MSGS = ['Great Job! 🎉','Excellent! 🌟','Amazing! 🚀','Well 
 // Para AGREGAR palabras por defecto, copia una línea con el mismo formato.
 // (También se pueden agregar palabras desde la pantalla "Manage Words")
 const DEFAULT_WORDS = [
-  {emoji:'🐝',word:'BEE',cat:'Animals'},{emoji:'🐱',word:'CAT',cat:'Animals'},{emoji:'🐶',word:'DOG',cat:'Animals'},
-  {emoji:'🐟',word:'FISH',cat:'Animals'},{emoji:'🦁',word:'LION',cat:'Animals'},{emoji:'🐘',word:'ELEPHANT',cat:'Animals'},
-  {emoji:'🐸',word:'FROG',cat:'Animals'},{emoji:'🦋',word:'BUTTERFLY',cat:'Animals'},
-  {emoji:'🍎',word:'APPLE',cat:'Food'},{emoji:'🍌',word:'BANANA',cat:'Food'},{emoji:'🍕',word:'PIZZA',cat:'Food'},
-  {emoji:'🍦',word:'ICE CREAM',cat:'Food'},{emoji:'🍓',word:'STRAWBERRY',cat:'Food'},
-  {emoji:'🚗',word:'CAR',cat:'Vehicles'},{emoji:'✈️',word:'PLANE',cat:'Vehicles'},{emoji:'🚀',word:'ROCKET',cat:'Vehicles'},
-  {emoji:'🚢',word:'SHIP',cat:'Vehicles'},
-  {emoji:'📚',word:'BOOK',cat:'School'},{emoji:'✏️',word:'PENCIL',cat:'School'},{emoji:'🎒',word:'BACKPACK',cat:'School'},
-  {emoji:'🔴',word:'RED',cat:'Colors'},{emoji:'🔵',word:'BLUE',cat:'Colors'},{emoji:'🟡',word:'YELLOW',cat:'Colors'},
-  {emoji:'🌳',word:'TREE',cat:'Nature'},{emoji:'🌻',word:'SUNFLOWER',cat:'Nature'},{emoji:'⛅',word:'CLOUD',cat:'Nature'},
+  {emoji:'🐱', word:'CAT', cat:'Camila'},
+  {emoji:'🎩', word:'HAT', cat:'Camila'},
+  {emoji:'🦇', word:'BAT', cat:'Camila'},
+  {emoji:'🧢', word:'CAP', cat:'Camila'},
+  {emoji:'🐀', word:'RAT', cat:'Camila'},
+  {emoji:'🎒', word:'BAG', cat:'Camila'},
+  {emoji:'🪭', word:'FAN', cat:'Camila'},
+  {emoji:'🍳', word:'PAN', cat:'Camila'},
+  {emoji:'🚐', word:'VAN', cat:'Camila'},
+  {emoji:'👨', word:'DAD', cat:'Camila'},
+  {emoji:'🍓', word:'JAM', cat:'Camila'},
+  {emoji:'🗺️', word:'MAP', cat:'Camila'},
+  {emoji:'🔴', word:'RED', cat:'Camila'},
+  {emoji:'🛏️', word:'BED', cat:'Camila'},
+  {emoji:'🖊️', word:'PEN', cat:'Camila'},
+  {emoji:'🥅', word:'NET', cat:'Camila'},
+  {emoji:'🦵', word:'LEG', cat:'Camila'},
+  {emoji:'☔', word:'WET', cat:'Camila'},
+  {emoji:'🐔', word:'HEN', cat:'Camila'},
+  {emoji:'🔟', word:'TEN', cat:'Camila'},
+  {emoji:'✈️', word:'JET', cat:'Camila'},
+  {emoji:'🐷', word:'PIG', cat:'Camila'},
+  {emoji:'🐘', word:'BIG', cat:'Camila'},
+  {emoji:'🪑', word:'SIT', cat:'Camila'},
+  {emoji:'⛏️', word:'DIG', cat:'Camila'},
+  {emoji:'🔧', word:'FIX', cat:'Camila'},
+  {emoji:'👄', word:'LIP', cat:'Camila'},
+  {emoji:'📌', word:'PIN', cat:'Camila'},
+  {emoji:'🐶', word:'DOG', cat:'Camila'},
+  {emoji:'🔥', word:'HOT', cat:'Camila'},
+  {emoji:'🦊', word:'FOX', cat:'Camila'},
+  {emoji:'👩', word:'MOM', cat:'Camila'},
+  {emoji:'📦', word:'BOX', cat:'Camila'},
+  {emoji:'🐰', word:'HOP', cat:'Camila'},
+  {emoji:'🧹', word:'MOP', cat:'Camila'},
+  {emoji:'🍲', word:'POT', cat:'Camila'},
+  {emoji:'🐞', word:'BUG', cat:'Camila'},
+  {emoji:'🌞', word:'SUN', cat:'Camila'},
+  {emoji:'🥤', word:'CUP', cat:'Camila'},
+  {emoji:'🏃', word:'RUN', cat:'Camila'}
 ];
 
 // ==========================================================================
@@ -1037,7 +1072,16 @@ function saveData() {
 }
 function loadData() {
   try {
-    const w = localStorage.getItem('sbk_words'); words = w ? JSON.parse(w) : JSON.parse(JSON.stringify(DEFAULT_WORDS));
+    const w = localStorage.getItem('sbk_words');
+    const saved = w ? JSON.parse(w) : [];
+    // Fusionar DEFAULT_WORDS con lo guardado en localStorage:
+    // Las palabras del código se agregan automáticamente si aún no existen
+    // (se compara por la palabra en mayúsculas). Así, al agregar palabras
+    // al DEFAULT_WORDS del código, siempre aparecerán en el banco.
+    const savedWords = new Set(saved.map(x => x.word.toUpperCase()));
+    const newFromCode = DEFAULT_WORDS.filter(d => !savedWords.has(d.word.toUpperCase()));
+    words = [...saved, ...newFromCode];
+    if(newFromCode.length > 0) saveData(); // Guardar la fusión para que persista
     const s = localStorage.getItem('sbk_stats'); if(s) stats = JSON.parse(s);
   } catch(e) { words = JSON.parse(JSON.stringify(DEFAULT_WORDS)); }
 }
@@ -1046,10 +1090,11 @@ function loadData() {
 // VOZ (Text-To-Speech): usa la API del navegador para pronunciar palabras
 // en inglés. "rate" controla la velocidad (1 = normal).
 // ==========================================================================
-function speak(text, rate=1) {
-  if (!window.speechSynthesis) return;
+function speak(text, rate=1, onDone=null) {
+  if (!window.speechSynthesis) { if(onDone) onDone(); return; }
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US'; u.rate = rate; u.pitch = 1.1;
+  if(onDone) u.onend = onDone;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
@@ -1193,8 +1238,14 @@ function loadWord() {
   const slotsEl = document.getElementById('slots');
   slotsEl.innerHTML = letters.map((_,i)=>`<div class="slot empty" data-idx="${i}" onclick="removeFromSlot(${i})"></div>`).join('');
 
-  // Crea los botones de letras en orden aleatorio
-  const mixed = shuffle([...letters]);
+  // Crea los botones de letras en orden aleatorio DIFERENTE al orden original.
+  // Se reintenta el shuffle hasta conseguir un orden distinto (máx. 20 intentos).
+  let mixed = shuffle([...letters]);
+  let attempts = 0;
+  while(mixed.join('') === letters.join('') && attempts < 20) {
+    mixed = shuffle([...letters]);
+    attempts++;
+  }
   const lettersEl = document.getElementById('letters');
   lettersEl.innerHTML = mixed.map((l,i)=>`<button class="letter-btn" data-li="${i}" onclick="placeLetter(this,'${l}')">${l}</button>`).join('');
 
@@ -1276,8 +1327,13 @@ function placeLetter(btn, letter) {
   slot.textContent = letter;
   slot.classList.remove('empty');
   slot.classList.add('filled');
-  speak(letter.toLowerCase(), 1.1);
-  if(!currentSlots.includes(null)) checkAnswer();
+  // Si es la última letra: esperar a que la letra termine de sonar (evento onend)
+  // y luego validar. Así la letra siempre se escucha completa antes del overlay.
+  if(!currentSlots.includes(null)) {
+    speak(letter.toLowerCase(), 1.1, checkAnswer);
+  } else {
+    speak(letter.toLowerCase(), 1.1);
+  }
 }
 
 // Se ejecuta al tocar/clickear un espacio (slot) que tiene una letra:
@@ -1415,9 +1471,16 @@ function addWord() {
   if(!wordRaw) { showToast('Please enter a word!'); return; }
   if(words.some(w=>w.word===wordRaw)) { showToast('Word already exists!'); return; }
   words.push({emoji, word:wordRaw, cat});
-  saveData(); renderWordList();
+  saveData();
+  // Limpiar el buscador para que la palabra nueva sea visible en la lista
+  document.getElementById('searchWords').value = '';
+  renderWordList(wordRaw);
   document.getElementById('newEmoji').value='';
   document.getElementById('newWord').value='';
+  document.getElementById('newWord').focus();
+  // Hacer scroll hasta el final de la lista para ver la palabra recién agregada
+  const list = document.getElementById('wordList');
+  setTimeout(()=>{ list.lastElementChild && list.lastElementChild.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 80);
   showToast('✅ Word added: '+wordRaw);
 }
 
@@ -1427,13 +1490,13 @@ function deleteWord(idx) {
   showToast('🗑 Word removed');
 }
 
-function renderWordList() {
+function renderWordList(highlightWord) {
   const search = (document.getElementById('searchWords').value||'').toLowerCase();
   const list = document.getElementById('wordList');
   document.getElementById('wordCount').textContent = words.length;
   const filtered = words.map((w,i)=>({...w,i})).filter(w=>!search||w.word.toLowerCase().includes(search)||w.emoji.includes(search));
   list.innerHTML = filtered.length===0 ? '<li style="text-align:center;padding:2rem;color:var(--text-muted)">No words found</li>' :
-    filtered.map(w=>`<li class="word-item">
+    filtered.map(w=>`<li class="word-item${highlightWord&&w.word===highlightWord?' word-item-new':''}">
       <span class="word-emoji-cell">${w.emoji}</span>
       <span class="word-text">${w.word}</span>
       <span class="word-cat">${w.cat}</span>
