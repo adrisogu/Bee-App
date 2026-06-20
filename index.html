@@ -1,622 +1,62 @@
 <!DOCTYPE html>
 <!--
   ============================================================================
-  SPELLING BEE KIDS - Aplicación de ortografía en inglés para niños
+  SPELLING BEE KIDS — Estructura del proyecto (separado en 3 archivos)
   ============================================================================
-  GUÍA RÁPIDA DEL ARCHIVO (todo está en un solo archivo HTML):
+  Archivos del proyecto:
+    index.html  → Estructura HTML de todas las pantallas
+    styles.css  → Todos los estilos visuales (colores, animaciones, responsive)
+    app.js      → Lógica del juego (datos, navegación, juego, admin, stats)
 
-  1. <style>            -> Todos los estilos visuales (colores, tamaños,
-                            animaciones, responsive). Buscar por secciones
-                            marcadas con comentarios "===== NOMBRE =====".
-
-  2. <body>             -> El HTML de cada "pantalla" de la app. Cada pantalla
-                            es un <div class="screen" id="..."> y solo una
-                            está visible a la vez (la que tiene clase "active").
-                            Pantallas: home, selector, game, complete, admin, stats.
-
-  3. <script>           -> Toda la lógica en JavaScript:
-                            - Datos y configuración (palabras, logros, mensajes)
-                            - Variables de estado del juego
-                            - Funciones de almacenamiento (localStorage)
-                            - Funciones de voz (Text-To-Speech)
-                            - Navegación entre pantallas
-                            - Lógica del juego (cargar palabra, validar, temporizador)
-                            - Funciones de administración (agregar/eliminar/importar palabras)
-                            - Funciones de estadísticas
+  PANTALLAS (screens):
+    #home      → Pantalla de inicio (abeja, título, botones)
+    #selector  → Elegir categoría, nivel y temporizador
+    #game      → Pantalla principal del juego
+    #complete  → Resumen al terminar la sesión
+    #admin     → Gestión del banco de palabras
+    #stats     → Estadísticas acumuladas
 
   ¿DÓNDE MODIFICAR SI QUIERO...?
-  - Cambiar colores generales        -> sección :root (variables --honey, --green, etc.)
-  - Cambiar el banco de palabras      -> constante DEFAULT_WORDS (en <script>)
-  - Cambiar mensajes de éxito         -> constante SUCCESS_MSGS (en <script>)
-  - Cambiar logros/medallas           -> constante ACHIEVEMENTS (en <script>)
-  - Cambiar tamaño de letras/slots     -> sección "GAME SCREEN" en <style>
-  - Cambiar el fondo animado (bosque) -> sección "Forest scenery" en <style> y HTML
-  - Cambiar las opciones del temporizador -> sección "Timer settings" (HTML + JS)
-  - Cambiar textos en pantalla         -> directamente en el HTML de cada pantalla
-  - Cambiar reglas de niveles (Beginner/Intermediate/Advanced) -> función getLevel()
+    - Cambiar colores generales          → :root en styles.css
+    - Cambiar el banco de palabras        → DEFAULT_WORDS en app.js
+    - Cambiar mensajes de éxito           → SUCCESS_MSGS en app.js
+    - Cambiar logros/medallas             → ACHIEVEMENTS en app.js
+    - Cambiar tamaño de letras/slots      → sección GAME SCREEN en styles.css
+    - Cambiar textos en pantalla          → directamente en index.html
+    - Cambiar reglas de niveles           → función getLevel() en app.js
+    - Agregar categorías al formulario    → <option> en el <select id="newCat">
   ============================================================================
 -->
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spelling Bee Kids</title>
-<!-- Librería externa SheetJS: permite leer archivos Excel (.xlsx/.xls) para importar palabras -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-  /* ==========================================================================
-     VARIABLES GLOBALES DE COLOR Y ESTILO
-     Cambia estos valores para modificar la paleta de colores de toda la app.
-     ========================================================================== */
-  :root {
-    --honey: #F5A623;        /* Color principal (miel/abeja) */
-    --honey-light: #FFF3DC;  /* Miel claro, para fondos suaves */
-    --honey-dark: #C8820A;   /* Miel oscuro, para textos y hover */
-    --orange: #FF7043;       /* Color secundario (naranja) */
-    --orange-light: #FFF0EB;
-    --green: #66BB6A;        /* Verde: usado en respuestas correctas y botón "Next" */
-    --green-light: #E8F5E9;
-    --blue: #42A5F5;         /* Azul: usado en el botón de pista (Hint) */
-    --blue-light: #E3F2FD;
-    --purple: #AB47BC;
-    --purple-light: #F3E5F5;
-    --red: #EF5350;          /* Rojo: errores, botón "Prev", temporizador */
-    --bg: #FFFEF7;           /* Fondo general de la app */
-    --card: #FFFFFF;         /* Color de tarjetas/paneles */
-    --text: #2D2D2D;         /* Color de texto principal */
-    --text-muted: #888;      /* Color de texto secundario/gris */
-    --border: #E8E0D0;       /* Color de bordes */
-    --shadow: 0 4px 20px rgba(245,166,35,0.15);
-    --radius: 20px;          /* Radio de borde grande */
-    --radius-sm: 12px;       /* Radio de borde pequeño */
-  }
-  /* Reset básico: quita márgenes/paddings por defecto del navegador */
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html { -webkit-text-size-adjust:100%; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; font-size: clamp(1rem, 0.9rem + 0.3vw, 1.2rem); line-height:1.5; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling Bee Kids</title>
 
-  /* ==========================================================================
-     CONTENEDOR REUTILIZABLE
-     Esta clase centra el contenido (horizontal y vertical) en cada pantalla.
-     Se usa en TODAS las pantallas para mantener un diseño consistente.
-     ========================================================================== */
-  .container-responsive {
-    width: min(95%, 1400px);
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-  }
+  <!-- Librería SheetJS: permite importar palabras desde archivos Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  /* ==========================================================================
-     PANTALLAS (SCREENS)
-     Cada pantalla de la app es un <div class="screen" id="...">.
-     Por defecto están ocultas (display:none); la que tiene la clase
-     "active" es la que se muestra. La función showScreen() (en JS) controla esto.
-     ========================================================================== */
-  .screen { display:none; min-height:100vh; min-height:100dvh; width:100%; flex-direction:column; align-items:center; justify-content:center; padding: clamp(1rem, 3vw, 2.5rem); overflow-y:auto; }
-  .screen.active { display:flex; }
-
-  /* ===== HOME SCREEN (Pantalla de inicio) =====
-     Pantalla principal: título "Spelling Bee", botones de inicio
-     (Start, My Stats, Manage Words) y abejas animadas de fondo. */
-  #home { background: linear-gradient(135deg, #FFF8E1 0%, #FFF3DC 50%, #FFF8E1 100%); position:relative; overflow:hidden; }
-  /* Capa de fondo decorativa donde "vuelan" las abejas */
-  .home-scene { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  /* Cada abeja del fondo: vuela de derecha a izquierda (flyBeeReverse) y sube/baja (bobBee) */
-  .home-bee { position:absolute; font-size: clamp(1.6rem, 3vw, 3rem); animation-name: flyBeeReverse, bobBee; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12)); transform: scaleX(-1); }
-  /* La abeja entra desde la derecha (15vw) y sale por la izquierda (-115vw) */
-  @keyframes flyBeeReverse { from{transform: scaleX(-1) translateX(15vw)} to{transform: scaleX(-1) translateX(-115vw)} }
-  .bee-container { text-align:center; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); position:relative; z-index:1; }
-  /* Abeja grande del centro, con animación de "flotar" */
-  .bee-emoji { font-size: clamp(4.5rem, 10vw, 9rem); display:block; animation: float 3s ease-in-out infinite; }
-  @keyframes float { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-20px) rotate(5deg)} }
-  .honeycomb-bg { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; opacity:0.06; z-index:0; }
-  /* Título "Spelling Bee": tamaño fluido (clamp) según ancho de pantalla */
-  .home-title { font-size: clamp(3rem, 6vw, 7rem); font-weight:900; color: var(--honey-dark); letter-spacing:-1px; line-height:1; }
-  .home-sub { font-size: clamp(1rem, 2vw, 2rem); color: var(--honey-dark); margin-top:0.5rem; opacity:0.85; }
-  .home-content { position:relative; z-index:1; width:min(95%, 480px); text-align:center; display:flex; flex-direction:column; align-items:center; }
-
-  /* ==========================================================================
-     BOTONES GENERALES (.btn, .btn-sm, .btn-primary, etc.)
-     Se reutilizan en TODA la app: Home, Selector, Admin, Stats...
-     Cambiar aquí afecta a todos los botones que usen estas clases.
-     ========================================================================== */
-  .btn { border:none; border-radius: 50px; cursor:pointer; font-weight:700; font-size: clamp(1rem, 1.5vw, 1.6rem); transition: all 0.2s; display:inline-flex; align-items:center; gap:8px; justify-content:center; min-height:48px; }
-  .btn:active { transform: scale(0.96); }
-  .btn-primary { background: var(--honey); color:#fff; padding: clamp(0.9rem,2vw,1.4rem) clamp(1.5rem,3vw,3rem); width:100%; box-shadow:0 6px 20px rgba(245,166,35,0.4); }
-  .btn-primary:hover { background: var(--honey-dark); box-shadow:0 8px 28px rgba(245,166,35,0.5); transform:translateY(-2px); }
-  .btn-secondary { background:transparent; color: var(--honey-dark); padding: clamp(0.8rem,1.6vw,1.2rem) clamp(1.2rem,2.5vw,2.5rem); width:100%; border:2.5px solid var(--honey); }
-  .btn-secondary:hover { background: var(--honey-light); }
-  .btn-sm { padding: clamp(0.55rem,1vw,0.8rem) clamp(1rem,1.6vw,1.6rem); font-size: clamp(0.85rem, 1vw, 1.1rem); border-radius:50px; border:none; cursor:pointer; font-weight:700; transition:all 0.2s; min-height:48px; }
-  .btn-danger { background: var(--red); color:#fff; }   /* "Reset Stats" y eliminar palabras */
-  .btn-success { background: var(--green); color:#fff; } /* "Add Word" */
-  .btn-info { background: var(--blue); color:#fff; }
-  .home-btns { display:flex; flex-direction:column; gap:1rem; margin-top: clamp(1.5rem, 3vw, 2.5rem); width:100%; }
-
-  /* ==========================================================================
-     PANTALLA "CHOOSE YOUR GAME" (Selector de Categoría / Nivel / Temporizador)
-     Aquí el usuario elige qué quiere practicar antes de jugar.
-     ========================================================================== */
-  #selector { background: linear-gradient(135deg, #E3F2FD 0%, #E8F5E9 100%); align-items:stretch; justify-content:flex-start; }
-  #selector .container-responsive { width:min(95%, 760px); align-items:stretch; justify-content:flex-start; }
-  /* Barra superior: botón "Back" + título de la pantalla */
-  .selector-topbar { display:flex; align-items:center; gap:1rem; margin-bottom: clamp(1rem,2vw,1.5rem); width:100%; }
-  /* Botón "← Back": tamaño fijo, NO se estira */
-  .back-btn {
-    flex: 0 0 auto;
-    display:inline-flex; align-items:center; gap:6px;
-    padding: clamp(0.55rem,1vw,0.85rem) clamp(1rem,1.8vw,1.6rem);
-    border-radius:50px; border:2px solid var(--border); background:var(--card);
-    font-size: clamp(0.9rem, 1.1vw, 1.15rem); font-weight:700; color: var(--text);
-    cursor:pointer; transition:all 0.18s; min-height:48px; box-shadow:0 2px 8px rgba(0,0,0,0.05);
-  }
-  .back-btn:hover { border-color: var(--honey); background: var(--honey-light); transform:translateX(-2px); }
-  .selector-title { font-size: clamp(1.5rem, 2.5vw, 2.5rem); font-weight:800; color: var(--text); margin:0; text-align:center; flex:1; }
-  /* Tarjeta blanca que agrupa cada sección (Categoría/Nivel, Temporizador) */
-  .selector-card { background:var(--card); border-radius: var(--radius-lg, 18px); border:1.5px solid var(--border); padding: clamp(1.1rem,2vw,1.8rem); margin-bottom: clamp(1rem,2vw,1.5rem); box-shadow:0 4px 16px rgba(0,0,0,0.04); }
-  .selector-section { width:100%; }
-  .selector-section + .selector-section { margin-top: clamp(1rem,2vw,1.5rem); }
-  .selector-label { font-size: clamp(0.85rem, 1vw, 1.1rem); font-weight:700; color: var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.75rem; }
-  /* "Chips" = pastillas/botones redondeados de Categoría, Nivel y Temporizador */
-  .chip-group { display:flex; flex-wrap:wrap; gap:0.6rem; }
-  .chip { padding: clamp(0.5rem,1vw,0.9rem) clamp(1rem,1.8vw,1.6rem); border-radius:50px; border:2px solid var(--border); background:var(--bg); cursor:pointer; font-size: clamp(0.85rem,1vw,1.15rem); font-weight:600; color: var(--text); transition:all 0.18s; min-height:48px; display:flex; align-items:center; }
-  .chip:hover { border-color: var(--honey); }
-  .chip.selected { background: var(--honey); border-color: var(--honey); color:#fff; } /* Chip seleccionado */
-  .chip-all { border-color: var(--honey-dark); }
-
-  /* --- Configuración del Temporizador (sección "Timer" en Choose Your Game) ---
-     Activa/desactiva el temporizador y elige 1/5/10 min o un valor
-     personalizado (minutos + segundos).
-     Lógica relacionada en <script>: onTimerToggle(), selectTimer(), getTimerSeconds() */
-  .timer-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
-  .timer-row-label { font-size: clamp(0.95rem, 1.1vw, 1.2rem); font-weight:700; color: var(--text); display:flex; align-items:center; gap:0.5rem; }
-  /* Interruptor (switch) tipo iOS para activar/desactivar el temporizador */
-  .toggle-switch { position:relative; display:inline-block; width:56px; height:30px; flex:none; }
-  .toggle-switch input { opacity:0; width:0; height:0; } /* El checkbox real queda invisible */
-  .toggle-slider { position:absolute; cursor:pointer; inset:0; background:var(--border); border-radius:99px; transition:.25s; }
-  .toggle-slider::before { content:''; position:absolute; height:24px; width:24px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.25s; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
-  .toggle-switch input:checked + .toggle-slider { background: var(--honey); } /* Color cuando está ENCENDIDO */
-  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(26px); } /* Mueve el círculo a la derecha */
-  /* Opciones de tiempo: 1 min / 5 min / 10 min / Custom */
-  .timer-options { display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:1rem; transition:opacity 0.2s, max-height 0.3s; }
-  .timer-options.disabled { opacity:0.4; pointer-events:none; } /* Se "apaga" si el timer está desactivado */
-  /* Fila con los campos numéricos de minutos y segundos (solo visible si se elige "Custom") */
-  .timer-custom-row { display:flex; align-items:center; gap:0.6rem; margin-top:0.85rem; flex-wrap:wrap; }
-  .timer-custom-row input[type="number"] {
-    border:2px solid var(--border); border-radius: var(--radius-sm); padding: clamp(0.5rem,1vw,0.8rem) clamp(0.6rem,1vw,0.9rem);
-    font-size: clamp(0.95rem, 1.1vw, 1.2rem); width:80px; min-height:48px; outline:none; transition:border-color 0.18s; font-weight:700; text-align:center;
-  }
-  .timer-custom-row input[type="number"]:focus { border-color: var(--honey); }
-  .timer-custom-row span { font-size: clamp(0.85rem, 1vw, 1.05rem); color: var(--text-muted); font-weight:600; }
-  .timer-custom-row.hidden { display:none; } /* Oculta la fila cuando NO se eligió "Custom" */
-
-  /* --- Insignia (badge) del temporizador dentro del juego, esquina del header ---
-     Se muestra/oculta y actualiza desde JS con updateTimerDisplay() */
-  .timer-badge {
-    background: rgba(255,255,255,0.85); border-radius:50px; padding: clamp(0.3rem,0.8vw,0.6rem) clamp(0.8rem,1.5vw,1.4rem);
-    font-size: clamp(0.9rem, 1.2vw, 1.3rem); font-weight:700; color: var(--orange); white-space:nowrap; backdrop-filter: blur(4px);
-    display:flex; align-items:center; gap:6px; transition:color 0.2s, background 0.2s;
-  }
-  /* Cuando quedan <= 10 segundos, el badge se pone rojo y "pulsa" */
-  .timer-badge.warning { color:#fff; background: var(--red); animation: timerPulse 0.8s ease-in-out infinite; }
-  @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
-
-  /* --- Aviso "Time's up!" (notificación tipo "push" desde arriba) ---
-     Por defecto está oculto fuera de pantalla (translateY(-150%) y opacity:0).
-     La clase ".show" (agregada/quitada por JS en showTimeUpBanner()) lo
-     desliza hacia abajo y lo hace visible durante unos segundos. */
-  .timeup-banner {
-    position:fixed; top: clamp(1rem,3vh,2.5rem); left:50%; transform:translateX(-50%) translateY(-150%);
-    background: var(--red); color:#fff; font-weight:900; font-size: clamp(1.1rem, 2vw, 1.8rem);
-    padding: clamp(0.8rem,1.5vw,1.3rem) clamp(1.5rem,3vw,2.5rem); border-radius: var(--radius-lg,18px);
-    box-shadow:0 10px 30px rgba(0,0,0,0.25); z-index:150;
-    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
-    display:flex; align-items:center; gap:0.6rem;
-    opacity:0; pointer-events:none;
-  }
-  .timeup-banner.show { transform:translateX(-50%) translateY(0); opacity:1; }
-
-  /* ==========================================================================
-     PANTALLA DE JUEGO (#game)
-     Aquí se muestra: el emoji de la palabra, los espacios para armarla,
-     las letras desordenadas, el fondo animado de bosque y los botones
-     de navegación (Home, Prev, Next).
-     ========================================================================== */
-  #game {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(180deg, #BFEAF5 0%, #DFF5C4 38%, #C8E6A0 60%, #9CCC65 100%);
-  }
-  #game .container-responsive { width:min(98%, 1400px); position:relative; z-index:2; }
-
-  /* --- Fondo animado tipo "bosque" (sol, nubes, abejas, árboles, flores, colinas) --- */
-  .forest-scene { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .forest-sun { position:absolute; top:4%; right:8%; width:clamp(60px,9vw,140px); height:clamp(60px,9vw,140px); border-radius:50%; background:radial-gradient(circle, #FFF6CC 0%, #FFE17A 60%, #FFD23F 100%); box-shadow:0 0 60px rgba(255,210,63,0.6); }
-  /* Nubes que se desplazan de derecha a izquierda */
-  .forest-cloud { position:absolute; opacity:0.85; animation: driftCloud linear infinite; }
-  .forest-cloud svg { display:block; width:clamp(80px,10vw,160px); height:auto; }
-  @keyframes driftCloud { from{transform:translateX(120vw)} to{transform:translateX(-30vw)} }
-
-  /* Colinas/montañas decorativas en la parte inferior (formas SVG) */
-  .forest-hill { position:absolute; bottom:0; left:0; width:100%; line-height:0; }
-  .forest-hill svg { display:block; width:100%; height:auto; }
-
-  /* Árboles que se "mecen" suavemente con el viento */
-  .forest-tree { position:absolute; bottom:0; transform-origin:bottom center; animation: swayTree 5s ease-in-out infinite; }
-  .forest-tree svg { display:block; height:clamp(90px,16vw,240px); width:auto; }
-  @keyframes swayTree { 0%,100%{transform:rotate(-1.5deg)} 50%{transform:rotate(1.5deg)} }
-
-  /* Flores decorativas que también se mecen */
-  .forest-flower { position:absolute; bottom: clamp(10px,2vh,30px); animation: swayTree 3.5s ease-in-out infinite; }
-  .forest-flower svg { display:block; width:clamp(28px,4vw,56px); height:auto; }
-
-  /* Abejas que vuelan de derecha a izquierda (flyBeeRTL) y suben/bajan (bobBee) */
-  .forest-bee { position:absolute; font-size: clamp(1.6rem, 3vw, 3rem); animation-name: flyBeeRTL, bobBee; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); transform: scaleX(-1); }
-  @keyframes flyBeeRTL { from{transform: scaleX(-1) translateX(15vw)} to{transform: scaleX(-1) translateX(-115vw)} }
-  @keyframes bobBee { 0%,100%{margin-top:0px} 50%{margin-top:-22px} }
-
-  /* --- Encabezado del juego: progreso (1/20), barra de progreso, timer y estrellas --- */
-  .game-header { width:100%; max-width:1400px; display:flex; align-items:center; justify-content:space-between; margin-bottom: clamp(1rem, 2vw, 2rem); gap: clamp(0.5rem,1.5vw,1.5rem); padding-left: clamp(48px, 7vw, 64px); }
-  .progress-text { font-size: clamp(0.9rem, 1.2vw, 1.3rem); font-weight:700; color: var(--text); white-space:nowrap; background:rgba(255,255,255,0.75); padding:0.3rem 0.9rem; border-radius:50px; backdrop-filter: blur(4px); }
-  .progress-bar-wrap { flex:1; height: clamp(10px, 1.2vw, 16px); background: rgba(255,255,255,0.55); border-radius:99px; overflow:hidden; backdrop-filter: blur(4px); }
-  .progress-bar-fill { height:100%; background: linear-gradient(90deg, var(--honey), var(--orange)); border-radius:99px; transition: width 0.4s ease; }
-  .stars-badge { background: rgba(255,255,255,0.85); border-radius:50px; padding: clamp(0.3rem,0.8vw,0.6rem) clamp(0.8rem,1.5vw,1.4rem); font-size: clamp(0.9rem, 1.2vw, 1.3rem); font-weight:700; color: var(--honey-dark); white-space:nowrap; backdrop-filter: blur(4px); }
-
-  /* Área principal del juego: emoji + espacios + letras */
-  .game-area { width:100%; max-width:1400px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(1.2rem, 2.5vw, 2.5rem); }
-
-  /* --- Marco circular del emoji (estilo "letrero de panal") ---
-     Para cambiar el TAMAÑO del emoji principal, ajusta .emoji-frame y .word-emoji */
-  .emoji-frame {
-    position: relative;
-    width: clamp(140px, 24vw, 280px);
-    height: clamp(140px, 24vw, 280px);
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #FFFDF5 0%, #FFF3DC 55%, #FFE7B0 100%);
-    border: clamp(6px, 1vw, 12px) solid var(--honey);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 12px 30px rgba(245,166,35,0.35), inset 0 0 0 clamp(4px,0.6vw,8px) #FFFFFF;
-  }
-  /* Anillo punteado que gira lentamente alrededor del marco */
-  .emoji-frame::before {
-    content:'';
-    position:absolute; inset: clamp(-10px,-1.4vw,-16px);
-    border-radius:50%;
-    border: clamp(3px,0.5vw,6px) dashed rgba(245,166,35,0.4);
-    animation: spinSlow 30s linear infinite;
-  }
-  @keyframes spinSlow { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-  /* El emoji se centra perfectamente (horizontal y vertical) dentro del marco */
-  .word-emoji { font-size: clamp(4.5rem, 13vw, 10rem); display:flex; align-items:center; justify-content:center; width:100%; height:100%; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.12)); transition:transform 0.3s; line-height:1; }
-  /* Animación de "rebote" cuando se completa la palabra correctamente */
-  .word-emoji.bounce { animation: bigBounce 0.6s ease; }
-  @keyframes bigBounce { 0%{transform:scale(1)} 30%{transform:scale(1.3) rotate(10deg)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
-
-  /* --- Espacios (slots) donde el niño coloca las letras de la palabra ---
-     Para cambiar el TAMAÑO de los espacios, ajusta .slot (width/height/font-size) */
-  .slots { display:flex; flex-wrap:wrap; gap: clamp(0.5rem, 1.4vw, 1.4rem); justify-content:center; width:100%; max-width:1100px; }
-  .slot {
-    width: clamp(56px, 9vw, 110px);
-    height: clamp(64px, 10vw, 124px);
-    border-radius: var(--radius-lg, 18px);
-    border: clamp(3px,0.4vw,5px) solid var(--honey);
-    background: var(--honey-light);
-    display:flex; align-items:center; justify-content:center;
-    font-size: clamp(2.2rem, 4.5vw, 4.5rem); font-weight:900; color: var(--honey-dark);
-    cursor:pointer; transition:all 0.2s; position:relative;
-    box-shadow: 0 4px 0 0 #E8C172, 0 8px 16px rgba(0,0,0,0.08);
-  }
-  .slot:hover { border-color: var(--orange); transform:translateY(-2px); }
-  .slot.empty { border-style:dashed; box-shadow:none; }      /* Espacio vacío (sin letra) */
-  .slot.filled { background: var(--honey); color:#fff; box-shadow: 0 4px 0 0 var(--honey-dark), 0 8px 16px rgba(245,166,35,0.3); } /* Espacio con letra colocada */
-  .slot.correct { background: var(--green); border-color: var(--green); color:#fff; box-shadow: 0 4px 0 0 #4C9650; animation: correctPop 0.4s ease; } /* Letra correcta */
-  @keyframes correctPop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
-  .slot.wrong { background: var(--red); border-color: var(--red); color:#fff; animation: shake 0.4s ease; } /* Palabra incorrecta (sacude) */
-  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
-
-  /* --- Letras desordenadas para que el niño las arrastre/toque ---
-     Para cambiar el TAMAÑO de las letras, ajusta .letter-btn (width/height/font-size) */
-  .letters { display:flex; flex-wrap:wrap; gap: clamp(0.6rem, 1.6vw, 1.6rem); justify-content:center; width:100%; max-width:1200px; }
-  .letter-btn {
-    width: clamp(56px, 9vw, 104px);
-    height: clamp(56px, 9vw, 104px);
-    border-radius: var(--radius-lg, 18px);
-    border: none;
-    background: var(--card);
-    box-shadow: 0 4px 0 0 var(--border), 0 8px 14px rgba(0,0,0,0.08);
-    font-size: clamp(2rem, 4.2vw, 4rem); font-weight:900; color: var(--text); cursor:pointer; transition:all 0.18s;
-  }
-  .letter-btn:hover:not(:disabled) { background: var(--honey); color:#fff; transform:translateY(-3px); box-shadow: 0 6px 0 0 var(--honey-dark), 0 10px 18px rgba(245,166,35,0.35); }
-  .letter-btn:disabled { opacity:0.2; transform:none; cursor:default; box-shadow:none; } /* Letra ya usada (colocada en un slot) */
-  .letter-btn:active:not(:disabled) { transform:translateY(2px); box-shadow: 0 2px 0 0 var(--honey-dark); }
-
-  /* --- (Botones de Pista y Limpiar eliminados) --- */
-
-  /* --- Navegación inferior del juego: flecha Prev (roja) y flecha Next (verde) --- */
-  .game-nav { width:100%; max-width:1400px; display:flex; justify-content:center; align-items:center; margin-top: clamp(1.5rem,3vw,3rem); gap: clamp(1rem,3vw,2.5rem); }
-  .nav-arrow-btn {
-    display:flex; align-items:center; justify-content:center;
-    width: clamp(44px, 6vw, 60px); height: clamp(44px, 6vw, 60px);
-    border-radius:50%; border:none; cursor:pointer; transition:all 0.18s;
-    font-size: clamp(1.3rem, 2.2vw, 1.9rem); font-weight:900; color:#fff;
-    box-shadow:0 4px 0 0 rgba(0,0,0,0.15), 0 6px 12px rgba(0,0,0,0.12);
-  }
-  .nav-arrow-btn:hover { transform:translateY(-2px); }
-  .nav-arrow-btn:active { transform:translateY(2px); box-shadow:0 1px 0 0 rgba(0,0,0,0.15); }
-  .nav-prev { background: var(--red); }   /* Botón "anterior" = círculo rojo con flecha ← */
-  .nav-prev:hover { background:#D9433F; }
-  .nav-next { background: var(--green); } /* Botón "siguiente" = círculo verde con flecha → */
-  .nav-next:hover { background:#57A65C; }
-  /* Botón flotante de inicio (solo icono 🏠), arriba a la izquierda de la pantalla de juego */
-  .nav-home-fab {
-    position:absolute; top: clamp(0.8rem, 2vw, 1.5rem); left: clamp(0.8rem, 2vw, 1.5rem);
-    display:flex; align-items:center; justify-content:center;
-    width: clamp(40px, 5.5vw, 52px); height: clamp(40px, 5.5vw, 52px);
-    border-radius:50%; border:none; cursor:pointer; transition:all 0.18s;
-    font-size: clamp(1.1rem, 1.8vw, 1.5rem); background:rgba(255,255,255,0.85);
-    box-shadow:0 3px 10px rgba(0,0,0,0.12); z-index:5; backdrop-filter: blur(4px);
-  }
-  .nav-home-fab:hover { background:#fff; transform:scale(1.06); }
-  /* Botón "← Home" usado en Admin (texto + icono) */
-  .nav-btn {
-    display:inline-flex; align-items:center; gap:6px;
-    padding: clamp(0.45rem,0.9vw,0.75rem) clamp(0.9rem,1.6vw,1.4rem);
-    border-radius:50px; border:2px solid var(--border); background:var(--card);
-    font-size: clamp(0.85rem, 1vw, 1.05rem); font-weight:700; color: var(--text);
-    cursor:pointer; transition:all 0.18s; min-height:44px; flex:none;
-  }
-  .nav-btn:hover { border-color: var(--honey); background: var(--honey-light); }
-  /* Botón pequeño circular (solo icono 🏠) usado en "My Stats" */
-  .nav-btn-sm {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:40px; height:40px; padding:0;
-    border-radius:50%; border:2px solid var(--border); background:var(--card);
-    font-size:1.1rem; cursor:pointer; transition:all 0.18s; flex:none;
-  }
-  .nav-btn-sm:hover { border-color: var(--honey); background: var(--honey-light); }
-
-  /* ==========================================================================
-     OVERLAY DE ÉXITO (ventana emergente al completar una palabra)
-     Muestra el emoji, el mensaje ("Great Job!", etc.), la palabra completa,
-     estrellas animadas y confeti. Se controla desde JS: showSuccess(), launchConfetti()
-     ========================================================================== */
-  .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:100; opacity:0; pointer-events:none; transition: opacity 0.3s; padding:1rem; }
-  .overlay.show { opacity:1; pointer-events:all; } /* Clase agregada por JS para mostrar el overlay */
-  .overlay-bg { position:absolute; inset:0; background:rgba(0,0,0,0.5); }
-  .overlay-card { position:relative; background:var(--card); border-radius: var(--radius); padding: clamp(1.8rem,4vw,3.5rem) clamp(1.5rem,3vw,3rem); text-align:center; max-width:420px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes popIn { from{transform:scale(0.7)} to{transform:scale(1)} }
-  .overlay-emoji { font-size: clamp(3.5rem, 6vw, 5.5rem); display:block; margin-bottom:1rem; animation: float 2s ease-in-out infinite; }
-  .overlay-message { font-size: clamp(1.4rem, 2.2vw, 2.2rem); font-weight:900; color: var(--honey-dark); margin-bottom:0.5rem; }
-  .overlay-word { font-size: clamp(1.6rem, 2.6vw, 2.6rem); font-weight:900; color: var(--text); margin-bottom:1.5rem; letter-spacing:4px; word-break:break-word; }
-  .stars-row { display:flex; justify-content:center; gap:0.3rem; font-size: clamp(2rem, 3vw, 3rem); margin-bottom:1.5rem; }
-  .star { display:inline-block; animation: starPop 0.4s ease backwards; }
-  @keyframes starPop { from{transform:scale(0) rotate(-30deg)} to{transform:scale(1) rotate(0)} }
-  /* Confeti animado: los elementos .confetti se generan dinámicamente con JS (launchConfetti) */
-  .confetti-wrap { position:absolute; inset:0; border-radius: var(--radius); overflow:hidden; pointer-events:none; }
-  .confetti { position:absolute; width:10px; height:10px; border-radius:2px; animation: confettiFall linear forwards; }
-  @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg); opacity:1} 100%{transform:translateY(300px) rotate(720deg); opacity:0} }
-
-  /* ==========================================================================
-     PANTALLA "AMAZING WORK!" (resumen al terminar la sesión de 20 palabras)
-     ========================================================================== */
-  #complete { background: linear-gradient(135deg, #FFF8E1 0%, #E8F5E9 100%); text-align:center; }
-  .complete-content { width:min(95%, 520px); display:flex; flex-direction:column; align-items:center; }
-  .complete-trophy { font-size: clamp(4.5rem, 8vw, 8rem); animation: float 3s ease-in-out infinite; margin-bottom:1rem; }
-  .complete-title { font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight:900; color: var(--honey-dark); margin-bottom:0.5rem; }
-  /* Cuadrícula de 4 tarjetas con las estadísticas de la sesión */
-  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap: clamp(0.8rem,1.5vw,1.5rem); margin: clamp(1rem,2vw,2rem) 0; width:100%; }
-  .stat-card { background:var(--card); border-radius: var(--radius-sm); padding: clamp(1rem,1.8vw,1.8rem); border:2px solid var(--border); }
-  .stat-num { font-size: clamp(1.8rem, 2.8vw, 3rem); font-weight:900; color: var(--honey-dark); }
-  .stat-label { font-size: clamp(0.8rem, 1vw, 1.1rem); color: var(--text-muted); font-weight:600; margin-top:2px; }
-
-  /* ==========================================================================
-     PANTALLA "MANAGE WORDS" (Panel de Administración)
-     Permite: agregar palabras manualmente, importar desde Excel, y ver/eliminar
-     el banco de palabras. En escritorio se muestra en 2 columnas (admin-grid),
-     en móvil en 1 sola columna.
-     ========================================================================== */
-  #admin { background: var(--bg); align-items:stretch; justify-content:flex-start; }
-  #admin .container-responsive { width:min(95%, 1400px); align-items:stretch; justify-content:flex-start; }
-  .admin-header { width:100%; display:flex; align-items:center; gap:1rem; padding: clamp(0.5rem,1.5vw,1.5rem) 0; margin-bottom: clamp(0.5rem,1.5vw,1.5rem); }
-  .admin-title { font-size: clamp(1.4rem, 2.2vw, 2.2rem); font-weight:800; flex:1; }
-  .admin-body { width:100%; }
-  /* Grid de 2 columnas en escritorio (ver media query >=1024px más abajo): izquierda=formularios, derecha=lista */
-  .admin-grid { display:grid; grid-template-columns:1fr; gap: clamp(1rem, 2vw, 2rem); align-items:start; }
-  /* "Tarjeta" blanca genérica usada para cada bloque (Add Word, Import, Word Bank) */
-  .panel { background:var(--card); border-radius: var(--radius); border:1.5px solid var(--border); padding: clamp(1.2rem, 2vw, 2rem); margin-bottom: clamp(1rem,2vw,1.5rem); }
-  .panel-title { font-size: clamp(1rem, 1.2vw, 1.3rem); font-weight:700; color: var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:1rem; }
-  .form-row { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
-  .input-field { border:2px solid var(--border); border-radius: var(--radius-sm); padding: clamp(0.6rem,1vw,0.9rem) clamp(0.8rem,1.2vw,1.2rem); font-size: clamp(1rem, 1.2vw, 1.3rem); flex:1; min-width:120px; min-height:48px; outline:none; transition:border-color 0.18s; }
-  .input-field:focus { border-color: var(--honey); }
-  .emoji-input { width:80px; flex:none; text-align:center; font-size: clamp(1.4rem, 2vw, 1.8rem); }
-  /* Lista de palabras del banco (con scroll si hay muchas) */
-  .word-list { list-style:none; max-height:min(60vh, 500px); overflow-y:auto; }
-  .word-item { display:flex; align-items:center; gap:1rem; padding: clamp(0.6rem,1.2vw,1rem) 0; border-bottom:1px solid var(--border); }
-  .word-item:last-child { border-bottom:none; }
-  .word-emoji-cell { font-size: clamp(1.4rem, 2vw, 1.8rem); width:40px; text-align:center; }
-  .word-text { flex:1; font-weight:700; font-size: clamp(1rem, 1.2vw, 1.3rem); }
-  .word-cat { font-size: clamp(0.75rem, 0.9vw, 1rem); color: var(--text-muted); background: var(--honey-light); border-radius:50px; padding:4px 10px; white-space:nowrap; }
-  /* Área para hacer clic y subir un archivo Excel (.xlsx/.xls) */
-  .import-area { border:3px dashed var(--honey); border-radius: var(--radius-sm); padding: clamp(1.5rem, 3vw, 2.5rem); text-align:center; cursor:pointer; transition:background 0.18s; }
-  .import-area:hover { background: var(--honey-light); }
-  .import-icon { font-size: clamp(2rem, 4vw, 3rem); margin-bottom:0.5rem; }
-  .import-text { color: var(--text-muted); font-size: clamp(0.85rem, 1vw, 1.05rem); }
-  /* Tabla de ejemplo que muestra cómo debe estar organizado el archivo Excel
-     (Columna A = Emoji, B = Word, C = Category) */
-  .excel-example { margin-top: clamp(1rem,1.6vw,1.4rem); }
-  .excel-example-label { font-size: clamp(0.75rem, 0.9vw, 1rem); font-weight:700; color: var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem; }
-  .excel-table { width:100%; border-collapse:collapse; border-radius: var(--radius-sm); overflow:hidden; border:1.5px solid var(--border); table-layout:fixed; }
-  .excel-table th, .excel-table td { padding: clamp(0.4rem,0.8vw,0.7rem); text-align:center; font-size: clamp(0.8rem, 1vw, 1.05rem); border:1px solid var(--border); }
-  .excel-table thead tr:first-child th { background: var(--text); color:#fff; font-weight:700; font-size: clamp(0.7rem, 0.85vw, 0.9rem); } /* Fila A/B/C */
-  .excel-table thead tr:last-child th { background: var(--honey-light); color: var(--honey-dark); font-weight:700; } /* Fila Emoji/Word/Category */
-  .excel-table tbody td { background: var(--card); font-weight:600; }
-  .excel-table tbody td:first-child { font-size: clamp(1.1rem, 1.6vw, 1.6rem); } /* Columna del emoji, más grande */
-  .select-field { border:2px solid var(--border); border-radius: var(--radius-sm); padding: clamp(0.6rem,1vw,0.9rem) clamp(0.8rem,1.2vw,1.2rem); font-size: clamp(0.9rem, 1.1vw, 1.2rem); background:var(--card); cursor:pointer; min-height:48px; }
-  .select-field:focus { border-color: var(--honey); outline:none; }
-  /* Mensaje flotante temporal (ej: "Word added!", "Stats reset") */
-  /* Resalta brevemente la palabra recién agregada en la lista */
-  .word-item-new {
-    animation: highlightNew 1.8s ease-out forwards;
-  }
-  @keyframes highlightNew {
-    0%   { background: #E8F5E9; border-color: var(--green); }
-    60%  { background: #E8F5E9; border-color: var(--green); }
-    100% { background: transparent; border-color: var(--border); }
-  }
-
-  .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(100px); background:var(--text); color:#fff; border-radius:50px; padding: clamp(0.7rem,1vw,1rem) clamp(1.2rem,2vw,2rem); font-size: clamp(0.9rem, 1vw, 1.1rem); font-weight:600; z-index:200; transition:transform 0.3s; max-width:90vw; text-align:center; }
-  .toast.show { transform:translateX(-50%) translateY(0); }
-
-  /* ==========================================================================
-     PANTALLA "MY STATS"
-     Muestra estadísticas acumuladas del estudiante: palabras completadas,
-     estrellas totales, precisión, sesiones jugadas, medallas y logros.
-     ========================================================================== */
-  #stats { background: var(--bg); align-items:stretch; justify-content:flex-start; }
-  #stats .container-responsive { width:min(95%, 800px); align-items:stretch; justify-content:flex-start; }
-  .stats-header { width:100%; display:flex; align-items:center; gap:1rem; margin-bottom: clamp(1rem,2vw,2rem); }
-  .stats-header span { font-size: clamp(1.4rem, 2.2vw, 2.2rem); font-weight:800; }
-  .medals-row { display:flex; gap: clamp(0.6rem,1.5vw,1.5rem); justify-content:center; flex-wrap:wrap; margin: clamp(1rem,2vw,1.5rem) 0; }
-  .medal { text-align:center; background:var(--card); border-radius: var(--radius-sm); padding: clamp(0.8rem,1.5vw,1.5rem); border:2px solid var(--border); min-width: clamp(80px, 12vw, 130px); }
-  .medal-icon { font-size: clamp(1.8rem, 3vw, 3rem); }
-  .medal-label { font-size: clamp(0.7rem, 0.9vw, 1rem); font-weight:700; color: var(--text-muted); margin-top:4px; }
-  #achievementsList > div { font-size: clamp(0.85rem, 1vw, 1.1rem); }
-
-  /* ==========================================================================
-     RESPONSIVE: PANTALLAS GRANDES (>1600px, monitores 2K/4K)
-     Aumenta tamaños generales (~25%) para aprovechar pantallas grandes.
-     ========================================================================== */
-  @media (min-width: 1600px) {
-    body { font-size: 1.25rem; }
-    .home-content { width:min(90%, 600px); }
-    .bee-emoji { font-size: clamp(7rem, 9vw, 11rem); }
-    .home-title { font-size: clamp(5.5rem, 6vw, 8.5rem); }
-    .home-sub { font-size: clamp(1.6rem, 2vw, 2.4rem); }
-    .btn-primary, .btn-secondary { padding-top: 1.6rem; padding-bottom: 1.6rem; }
-    #game .container-responsive, .game-header, .game-area, .game-nav { max-width:1700px; }
-    .emoji-frame { width: clamp(220px, 20vw, 320px); height: clamp(220px, 20vw, 320px); }
-    .word-emoji { font-size: clamp(7rem, 11vw, 11.5rem); }
-    .slots, .letters { max-width:1400px; }
-    .slot { width: clamp(90px, 7vw, 130px); height: clamp(100px, 8vw, 145px); font-size: clamp(3rem, 4vw, 5rem); }
-    .letter-btn { width: clamp(85px, 7vw, 124px); height: clamp(85px, 7vw, 124px); font-size: clamp(2.8rem, 3.6vw, 4.6rem); }
-    .panel { padding: 2.5rem; }
-    #admin .container-responsive, #stats .container-responsive { width:min(90%, 1600px); }
-    #stats .container-responsive { width:min(90%, 1000px); }
-  }
-
-  /* ==========================================================================
-     RESPONSIVE: ESCRITORIOS / TABLETS HORIZONTALES (a partir de 1024px)
-     A partir de aquí, el panel de Admin pasa a 2 columnas y los botones
-     del Home se colocan en fila en lugar de en columna.
-     ========================================================================== */
-  @media (min-width: 1024px) {
-    .admin-grid { grid-template-columns: 1fr 1.5fr; gap: 2rem; } /* Izquierda: formularios | Derecha: lista de palabras */
-    .admin-grid .admin-left { display:flex; flex-direction:column; }
-    .home-btns { flex-direction: row; flex-wrap:wrap; }
-    .home-btns .btn { flex:1; min-width:200px; }
-  }
-
-  /* ==========================================================================
-     RESPONSIVE: TABLETS (768px - 1024px)
-     ========================================================================== */
-  @media (min-width: 768px) and (max-width: 1024px) {
-    .panel { padding: 1.6rem; }
-    .input-field, .select-field, .btn-sm, .nav-btn, .chip { min-height:52px; }
-    .letters { gap: 1rem; }
-    .slot, .letter-btn { font-size: clamp(2rem, 3.5vw, 2.8rem); }
-  }
-
-  /* ==========================================================================
-     RESPONSIVE: CELULARES (menos de 768px)
-     Aquí los botones ocupan todo el ancho, los chips se acomodan en columna
-     o grid, y se reducen/ocultan elementos decorativos para que no haya
-     scroll horizontal ni elementos que se salgan de la pantalla.
-     ========================================================================== */
-  @media (max-width: 767px) {
-    .screen { padding: 1rem; }
-    .home-btns { width:100%; }
-    .btn, .btn-sm, .chip { width:100%; }
-    .admin-header .nav-btn, .selector-topbar .back-btn { width:auto; flex:none; } /* Estos botones NO se estiran */
-    .chip-group { flex-direction:column; align-items:stretch; }
-    .chip { justify-content:center; text-align:center; width:100%; }
-    .game-nav .nav-btn { width:auto; }
-    .form-row { flex-direction:column; align-items:stretch; }
-    .emoji-input { width:100%; }
-    #admin .container-responsive .form-row #newCat { width:100%; }
-    .word-item { flex-wrap:wrap; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .overlay-card { padding: 1.5rem 1.2rem; }
-    .emoji-frame { width: clamp(120px, 38vw, 200px); height: clamp(120px, 38vw, 200px); } /* Marco del emoji más pequeño */
-    .forest-tree { transform:scale(0.65); } /* Árboles más pequeños */
-    .forest-tree[style*="left:18%"], .forest-tree[style*="right:16%"] { display:none; } /* Oculta árboles secundarios */
-    .timer-options { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; } /* Opciones de timer en 2 columnas */
-    .timer-options .chip { width:100%; justify-content:center; }
-    .selector-topbar { gap:0.5rem; }
-    .selector-topbar span[aria-hidden] { display:none; }
-  }
-
-  /* ==========================================================================
-     RESPONSIVE: TABLETS HORIZONTALES DE POCA ALTURA (ej. Samsung Tab E 9.6"
-     1280x800). En orientación horizontal, la altura disponible real (tras la
-     barra del navegador) suele ser ~700-760px. Sin este ajuste, el emoji
-     grande + slots + letras + botones no entran en la pantalla y se cortan
-     o generan scroll. Aquí se compacta todo verticalmente: menos gaps, menos
-     paddings y elementos más pequeños, para que la vista del juego completa
-     (letras incluidas) se vea sin necesidad de hacer scroll.
-     Se activa solo en horizontal (landscape) con poca altura.
-     ========================================================================== */
-  @media (orientation: landscape) and (max-height: 800px) {
-    .screen { padding: 0.5rem clamp(1rem, 2vw, 1.6rem); justify-content:flex-start; }
-    #game .container-responsive { justify-content:flex-start; padding-top:0.2rem; }
-    .game-header { margin-bottom: clamp(0.5rem, 1vw, 0.8rem); padding-left: clamp(40px, 5vw, 56px); }
-    .game-area { gap: clamp(0.8rem, 2vw, 1.6rem); }
-    .nav-home-fab { width:36px; height:36px; font-size:1rem; top:0.5rem; left:0.5rem; }
-    .emoji-frame { width: clamp(130px, 19vw, 220px); height: clamp(130px, 19vw, 220px); border-width: clamp(5px,0.8vw,10px); }
-    .word-emoji { font-size: clamp(4.2rem, 10vw, 8rem); }
-    .slots { gap: clamp(0.5rem, 1.1vw, 1rem); max-width:1180px; }
-    .slot { width: clamp(56px, 8vw, 90px); height: clamp(64px, 9vw, 100px); font-size: clamp(2rem, 3.6vw, 3.2rem); border-width: clamp(3px,0.4vw,4px); }
-    .letters { gap: clamp(0.5rem, 1.2vw, 1.1rem); max-width:1180px; }
-    .letter-btn { width: clamp(56px, 8vw, 90px); height: clamp(56px, 8vw, 90px); font-size: clamp(1.9rem, 3.4vw, 3rem); }
-    .game-nav { margin-top: clamp(0.4rem, 1.2vw, 0.9rem); gap: clamp(0.8rem, 2vw, 1.6rem); }
-    .nav-arrow-btn { width: clamp(34px, 4.5vw, 44px); height: clamp(34px, 4.5vw, 44px); font-size: clamp(1rem, 1.6vw, 1.3rem); }
-    .forest-tree, .forest-flower { transform: scale(0.7); }
-  }
-
-  /* Pantallas muy pequeñas: reduce un poco más el tamaño de slots/letras */
-  @media (max-width: 380px) {
-    .slot, .letter-btn { width: clamp(40px, 11vw, 56px); height: clamp(48px, 13vw, 64px); }
-    .letter-btn { height: clamp(40px, 11vw, 56px); }
-  }
-
-  /* Si el usuario tiene activada la opción "reducir movimiento" del sistema,
-     se desactivan las animaciones decorativas (abejas, nubes, árboles, etc.) */
-  @media (prefers-reduced-motion: reduce) {
-    .forest-bee, .forest-cloud, .forest-tree, .forest-flower, .emoji-frame::before, .bee-emoji, .complete-trophy, .word-emoji.bounce { animation: none !important; }
-  }
-</style>
+  <!-- Hoja de estilos principal -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <!-- ==========================================================================
-     TOAST: mensaje flotante temporal en la parte inferior (ej: "Word added!")
-     Se muestra/oculta agregando la clase "show" desde la función showToast()
+     TOAST: mensaje flotante temporal en la parte inferior
+     Se muestra/oculta con showToast() en app.js
      ========================================================================== -->
 <div class="toast" id="toast"></div>
 
 <!-- ==========================================================================
-     AVISO "TIME'S UP!" - notificación tipo "push" que aparece deslizándose
-     desde la parte superior cuando se acaba el tiempo del temporizador.
-     Controlado por showTimeUpBanner() en el <script>.
+     AVISO "TIME'S UP!": aparece deslizándose desde arriba cuando se acaba
+     el tiempo del temporizador. Controlado por showTimeUpBanner() en app.js.
      ========================================================================== -->
 <div class="timeup-banner" id="timeupBanner">⏰ <span>Time's up!</span></div>
 
 <!-- ==========================================================================
-     OVERLAY DE ÉXITO: ventana emergente que aparece al completar
-     correctamente una palabra (emoji, mensaje, palabra, estrellas, confeti).
-     Se muestra/oculta con showSuccess() y nextWord() en el <script>.
+     OVERLAY DE ÉXITO: ventana emergente al completar correctamente una palabra.
+     Muestra: emoji, mensaje, palabra, estrellas y confeti.
+     Se controla con showSuccess() y nextWord() en app.js.
      ========================================================================== -->
 <div class="overlay" id="successOverlay">
   <div class="overlay-bg" onclick="nextWord()"></div>
@@ -626,90 +66,103 @@
     <div class="overlay-message" id="overlayMessage">Great Job!</div>
     <div class="overlay-word" id="overlayWord"></div>
     <div class="stars-row" id="starsRow"></div>
-    <button class="btn btn-primary" onclick="nextWord()" style="font-size:1rem; padding:0.9rem 2rem;">Next Word ➜</button>
+    <button class="btn btn-primary" onclick="nextWord()" style="font-size:1rem; padding:0.9rem 2rem;">
+      Next Word ➜
+    </button>
   </div>
 </div>
 
 <!-- ==========================================================================
-     PANTALLA 1: HOME (Inicio)
-     id="home" - Esta es la pantalla que se ve primero al abrir la app
-     (tiene la clase "active" desde el inicio en el HTML).
+     PANTALLA 1: HOME
+     Primera pantalla visible (clase "active"). Contiene el título, la abeja
+     animada y los botones de navegación principales.
      ========================================================================== -->
 <div class="screen active" id="home">
-  <!-- Patrón decorativo de hexágonos (panal) muy sutil de fondo -->
+  <!-- Patrón de hexágonos (panal) muy sutil en el fondo -->
   <div style="position:absolute;inset:0;overflow:hidden;z-index:0;opacity:0.07;pointer-events:none">
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><pattern id="hex" width="60" height="52" patternUnits="userSpaceOnUse"><polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#C8820A" stroke-width="2"/></pattern><rect width="100%" height="100%" fill="url(#hex)"/></svg>
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <pattern id="hex" width="60" height="52" patternUnits="userSpaceOnUse">
+        <polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#C8820A" stroke-width="2"/>
+      </pattern>
+      <rect width="100%" height="100%" fill="url(#hex)"/>
+    </svg>
   </div>
-  <!-- Abejas animadas que vuelan de derecha a izquierda en el fondo
-       (cada una con distinto "top", duración y retraso para que no se vean iguales) -->
+
+  <!-- Abejas animadas de fondo (vuelan de derecha a izquierda) -->
   <div class="home-scene" aria-hidden="true">
     <div class="home-bee" style="top:12%; animation-duration:16s, 2.4s; animation-delay:0s, 0s;">🐝</div>
     <div class="home-bee" style="top:28%; animation-duration:22s, 3s; animation-delay:-7s, -1s;">🐝</div>
     <div class="home-bee" style="top:68%; animation-duration:19s, 2.6s; animation-delay:-3s, -0.6s;">🐝</div>
     <div class="home-bee" style="top:82%; animation-duration:25s, 3.2s; animation-delay:-12s, -2s;">🐝</div>
   </div>
+
   <div class="container-responsive">
     <div class="home-content" style="position:relative;z-index:1">
-      <!-- Logo/título principal -->
+      <!-- Logo y título principal -->
       <div class="bee-container">
         <span class="bee-emoji">🐝</span>
         <h1 class="home-title">Spelling Bee</h1>
         <p class="home-sub">Learn to spell with the bees!</p>
       </div>
-      <!-- Botones principales de navegación:
-           - Start          -> abre la pantalla "Choose your game" (showSelector)
-           - My Stats        -> abre la pantalla de estadísticas
-           - Manage Words    -> abre el panel de administración -->
+
+      <!-- Botones de navegación:
+           Start         → showSelector() → pantalla "Choose your game"
+           My Stats      → showScreen('stats')
+           Manage Words  → showScreen('admin') -->
       <div class="home-btns">
-        <button class="btn btn-primary" onclick="showSelector()">🎮 Start</button>
+        <button class="btn btn-primary"   onclick="showSelector()">🎮 Start</button>
         <button class="btn btn-secondary" onclick="showScreen('stats')">📊 My Stats</button>
         <button class="btn btn-secondary" onclick="showScreen('admin')">⚙️ Manage Words</button>
       </div>
-      <!-- Texto que muestra cuántas palabras hay en el banco (se llena con JS: updateHomeCount) -->
-      <p style="margin-top:1.5rem;font-size:clamp(0.8rem,1vw,1.05rem);color:var(--text-muted)" id="wordCountBadge"></p>
+
+      <!-- Contador de palabras en el banco (se llena con updateHomeCount() en app.js) -->
+      <p style="margin-top:1.5rem;font-size:clamp(0.8rem,1vw,1.05rem);color:var(--text-muted)"
+         id="wordCountBadge"></p>
     </div>
   </div>
 </div>
 
 <!-- ==========================================================================
      PANTALLA 2: SELECTOR ("Choose your game")
-     id="selector" - Aquí el usuario elige Categoría, Nivel y configura
-     el Temporizador antes de iniciar la partida.
+     El usuario elige Categoría, Nivel, Temporizador y cantidad de palabras
+     antes de iniciar la partida.
      ========================================================================== -->
 <div class="screen" id="selector">
   <div class="container-responsive">
-    <!-- Barra superior: botón "Back" (regresa a Home) + título -->
+
+    <!-- Barra superior: botón "Back" + título centrado -->
     <div class="selector-topbar">
-      <button class="back-btn" onclick="showScreen('home')"><span aria-hidden="true">←</span> Back</button>
+      <button class="back-btn" onclick="showScreen('home')">
+        <span aria-hidden="true">←</span> Back
+      </button>
       <h2 class="selector-title">🎯 Choose your game</h2>
-      <span style="flex:0 0 auto; width:48px;" aria-hidden="true"></span> <!-- Espaciador para centrar el título -->
+      <!-- Espaciador para centrar el título -->
+      <span style="flex:0 0 auto; width:48px;" aria-hidden="true"></span>
     </div>
 
-    <!-- Tarjeta 1: Selección de Categoría y Nivel de dificultad -->
+    <!-- Tarjeta 1: Categoría y Nivel -->
     <div class="selector-card">
       <div class="selector-section">
         <div class="selector-label">Category</div>
-        <!-- Las opciones de categoría se generan dinámicamente con JS según las
-             categorías existentes en el banco de palabras (ver showSelector()) -->
+        <!-- Los chips de categoría se generan dinámicamente en showSelector() (app.js) -->
         <div class="chip-group" id="catChips"></div>
       </div>
       <div class="selector-section">
         <div class="selector-label">Level</div>
-        <!-- Niveles fijos: All / Beginner (3-4 letras) / Intermediate (5-7) / Advanced (8+)
-             La clasificación de nivel según longitud está en la función getLevel() del JS -->
+        <!-- Niveles según longitud de la palabra (ver getLevel() en app.js) -->
         <div class="chip-group">
-          <div class="chip selected" data-level="all" onclick="selectLevel(this)">All</div>
-          <div class="chip" data-level="beginner" onclick="selectLevel(this)">🟢 Beginner (3-4)</div>
-          <div class="chip" data-level="intermediate" onclick="selectLevel(this)">🟡 Intermediate (5-7)</div>
-          <div class="chip" data-level="advanced" onclick="selectLevel(this)">🔴 Advanced (8+)</div>
+          <div class="chip selected" data-level="all"          onclick="selectLevel(this)">All</div>
+          <div class="chip"          data-level="beginner"     onclick="selectLevel(this)">🟢 Beginner (3-4)</div>
+          <div class="chip"          data-level="intermediate" onclick="selectLevel(this)">🟡 Intermediate (5-7)</div>
+          <div class="chip"          data-level="advanced"     onclick="selectLevel(this)">🔴 Advanced (8+)</div>
         </div>
       </div>
     </div>
 
-    <!-- Tarjeta 2: Configuración del Temporizador -->
+    <!-- Tarjeta 2: Temporizador -->
     <div class="selector-card">
       <div class="selector-section">
-        <!-- Interruptor para activar/desactivar el temporizador (función onTimerToggle) -->
+        <!-- Interruptor activar/desactivar timer -->
         <div class="timer-row">
           <span class="timer-row-label">⏱️ Timer</span>
           <label class="toggle-switch">
@@ -717,14 +170,14 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
-        <!-- Opciones de tiempo predefinidas + "Custom" (función selectTimer) -->
+        <!-- Opciones de tiempo predefinidas + Custom -->
         <div class="timer-options" id="timerOptions">
-          <div class="chip selected" data-timer="1" onclick="selectTimer(this)">1 min</div>
-          <div class="chip" data-timer="5" onclick="selectTimer(this)">5 min</div>
-          <div class="chip" data-timer="10" onclick="selectTimer(this)">10 min</div>
-          <div class="chip" data-timer="custom" onclick="selectTimer(this)">Custom</div>
+          <div class="chip selected" data-timer="1"      onclick="selectTimer(this)">1 min</div>
+          <div class="chip"          data-timer="5"      onclick="selectTimer(this)">5 min</div>
+          <div class="chip"          data-timer="10"     onclick="selectTimer(this)">10 min</div>
+          <div class="chip"          data-timer="custom" onclick="selectTimer(this)">Custom</div>
         </div>
-        <!-- Campos de minutos y segundos personalizados (solo visibles si se elige "Custom") -->
+        <!-- Campos de minutos/segundos (solo visibles al elegir "Custom") -->
         <div class="timer-custom-row hidden" id="timerCustomRow">
           <input type="number" id="timerCustomMinutes" min="0" max="59" value="3" aria-label="Minutes">
           <span>min</span>
@@ -734,7 +187,7 @@
       </div>
     </div>
 
-    <!-- Tarjeta 3: Cantidad de palabras a practicar -->
+    <!-- Tarjeta 3: Cantidad de palabras -->
     <div class="selector-card">
       <div class="selector-section">
         <div class="timer-row">
@@ -744,11 +197,12 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
-        <!-- Texto informativo: muestra cuántas palabras hay disponibles con los filtros actuales -->
-        <div id="wordCountInfo" style="margin-top:0.75rem; font-size:clamp(0.85rem,1vw,1.05rem); color:var(--text-muted);">
+        <!-- Texto informativo (se actualiza con updateWordCountInfo() en app.js) -->
+        <div id="wordCountInfo"
+             style="margin-top:0.75rem; font-size:clamp(0.85rem,1vw,1.05rem); color:var(--text-muted);">
           All available words will be used
         </div>
-        <!-- Campo custom: solo visible si el toggle está activo -->
+        <!-- Campo custom (visible solo si el toggle está activo) -->
         <div class="timer-custom-row hidden" id="wordCountCustomRow">
           <input type="number" id="wordCountCustomValue" min="1" max="999" value="10" aria-label="Number of words">
           <span>words</span>
@@ -756,122 +210,194 @@
       </div>
     </div>
 
-    <!-- Botón para iniciar la partida con la configuración elegida (función startGame) -->
-    <button class="btn btn-primary" onclick="startGame()" style="margin-top:0.5rem">🐝 Play!</button>
+    <!-- Botón para iniciar la partida -->
+    <button class="btn btn-primary" onclick="startGame()" style="margin-top:0.5rem">
+      🐝 Play!
+    </button>
+
   </div>
 </div>
 
 <!-- ==========================================================================
-     PANTALLA 3: JUEGO (#game)
-     Aquí ocurre la actividad principal: ver el emoji, armar la palabra
-     con las letras desordenadas, usar pistas, y avanzar entre palabras.
+     PANTALLA 3: GAME
+     Pantalla principal del juego: emoji, slots, letras desordenadas y navegación.
      ========================================================================== -->
 <div class="screen" id="game">
-  <!-- Decoración de fondo tipo "bosque" (sol, nubes, abejas, árboles, flores, colinas).
-       Todo dentro de "forest-scene" es puramente visual (aria-hidden) y no
-       afecta la lógica del juego. -->
+
+  <!-- Decoración de fondo "bosque" (solo visual, aria-hidden) -->
   <div class="forest-scene" aria-hidden="true">
-    <!-- Sol fijo en la esquina superior derecha -->
+
+    <!-- Sol fijo esquina superior derecha -->
     <div class="forest-sun"></div>
 
-    <!-- Nubes (cada una es un SVG con 3 óvalos). Se mueven de derecha a izquierda. -->
+    <!-- Nubes que se desplazan de derecha a izquierda -->
     <div class="forest-cloud" style="top:8%; left:0; animation-duration:46s;">
-      <svg viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="45" ry="28" fill="#ffffff"/><ellipse cx="95" cy="38" rx="38" ry="32" fill="#ffffff"/><ellipse cx="125" cy="52" rx="32" ry="22" fill="#ffffff"/></svg>
+      <svg viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50"  cy="50" rx="45" ry="28" fill="#ffffff"/>
+        <ellipse cx="95"  cy="38" rx="38" ry="32" fill="#ffffff"/>
+        <ellipse cx="125" cy="52" rx="32" ry="22" fill="#ffffff"/>
+      </svg>
     </div>
     <div class="forest-cloud" style="top:18%; left:0; animation-duration:62s; animation-delay:-20s;">
-      <svg viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="40" ry="24" fill="#ffffff"/><ellipse cx="90" cy="40" rx="32" ry="28" fill="#ffffff"/><ellipse cx="120" cy="52" rx="28" ry="20" fill="#ffffff"/></svg>
+      <svg viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50"  cy="50" rx="40" ry="24" fill="#ffffff"/>
+        <ellipse cx="90"  cy="40" rx="32" ry="28" fill="#ffffff"/>
+        <ellipse cx="120" cy="52" rx="28" ry="20" fill="#ffffff"/>
+      </svg>
     </div>
 
-    <!-- Abejas que vuelan de derecha a izquierda (flyBeeRTL) a distintas alturas y velocidades.
-         Para agregar/quitar abejas, copia o elimina una de estas líneas. -->
+    <!-- Abejas volando de derecha a izquierda -->
     <div class="forest-bee" style="top:14%; animation-duration:18s, 2.4s; animation-delay:0s, 0s;">🐝</div>
-    <div class="forest-bee" style="top:30%; animation-duration:24s, 3s; animation-delay:-6s, -1s;">🐝</div>
+    <div class="forest-bee" style="top:30%; animation-duration:24s, 3s;   animation-delay:-6s, -1s;">🐝</div>
     <div class="forest-bee" style="top:46%; animation-duration:20s, 2.7s; animation-delay:-12s, -0.5s;">🐝</div>
-    <div class="forest-bee" style="top:8%; animation-duration:28s, 3.4s; animation-delay:-3s, -2s;">🐝</div>
+    <div class="forest-bee" style="top:8%;  animation-duration:28s, 3.4s; animation-delay:-3s, -2s;">🐝</div>
 
-    <!-- Árboles a los costados (en móvil, los 2 árboles "secundarios" se ocultan, ver media query <768px) -->
+    <!-- Árboles a los costados -->
     <div class="forest-tree" style="left:2%; animation-delay:0s;">
-      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/><circle cx="50" cy="55" r="42" fill="#7CB342"/><circle cx="28" cy="75" r="28" fill="#8BC34A"/><circle cx="72" cy="75" r="28" fill="#8BC34A"/></svg>
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/>
+        <circle cx="50" cy="55" r="42" fill="#7CB342"/>
+        <circle cx="28" cy="75" r="28" fill="#8BC34A"/>
+        <circle cx="72" cy="75" r="28" fill="#8BC34A"/>
+      </svg>
     </div>
     <div class="forest-tree" style="right:3%; animation-delay:-1.5s;">
-      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/><circle cx="50" cy="55" r="42" fill="#7CB342"/><circle cx="28" cy="75" r="28" fill="#8BC34A"/><circle cx="72" cy="75" r="28" fill="#8BC34A"/></svg>
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/>
+        <circle cx="50" cy="55" r="42" fill="#7CB342"/>
+        <circle cx="28" cy="75" r="28" fill="#8BC34A"/>
+        <circle cx="72" cy="75" r="28" fill="#8BC34A"/>
+      </svg>
     </div>
     <div class="forest-tree" style="left:18%; animation-delay:-2.5s; opacity:0.85; transform:scale(0.8);">
-      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/><circle cx="50" cy="55" r="42" fill="#9CCC65"/><circle cx="28" cy="75" r="28" fill="#AED581"/><circle cx="72" cy="75" r="28" fill="#AED581"/></svg>
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/>
+        <circle cx="50" cy="55" r="42" fill="#9CCC65"/>
+        <circle cx="28" cy="75" r="28" fill="#AED581"/>
+        <circle cx="72" cy="75" r="28" fill="#AED581"/>
+      </svg>
     </div>
     <div class="forest-tree" style="right:16%; animation-delay:-3.5s; opacity:0.85; transform:scale(0.8);">
-      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/><circle cx="50" cy="55" r="42" fill="#9CCC65"/><circle cx="28" cy="75" r="28" fill="#AED581"/><circle cx="72" cy="75" r="28" fill="#AED581"/></svg>
+      <svg viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="42" y="100" width="16" height="60" rx="4" fill="#A1665E"/>
+        <circle cx="50" cy="55" r="42" fill="#9CCC65"/>
+        <circle cx="28" cy="75" r="28" fill="#AED581"/>
+        <circle cx="72" cy="75" r="28" fill="#AED581"/>
+      </svg>
     </div>
 
-    <!-- Flores decorativas con distintos colores de pétalos -->
-    <div class="forest-flower" style="left:8%; animation-delay:0s;">
-      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="20" width="4" height="40" fill="#558B2F"/><circle cx="20" cy="14" r="6" fill="#FFEB3B"/><circle cx="12" cy="18" r="6" fill="#F06292"/><circle cx="28" cy="18" r="6" fill="#F06292"/><circle cx="14" cy="9" r="6" fill="#F06292"/><circle cx="26" cy="9" r="6" fill="#F06292"/></svg>
+    <!-- Flores decorativas -->
+    <div class="forest-flower" style="left:8%;  animation-delay:0s;">
+      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">
+        <rect x="18" y="20" width="4" height="40" fill="#558B2F"/>
+        <circle cx="20" cy="14" r="6" fill="#FFEB3B"/>
+        <circle cx="12" cy="18" r="6" fill="#F06292"/>
+        <circle cx="28" cy="18" r="6" fill="#F06292"/>
+        <circle cx="14" cy="9"  r="6" fill="#F06292"/>
+        <circle cx="26" cy="9"  r="6" fill="#F06292"/>
+      </svg>
     </div>
     <div class="forest-flower" style="left:38%; animation-delay:-1s;">
-      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="20" width="4" height="40" fill="#558B2F"/><circle cx="20" cy="14" r="6" fill="#FFEB3B"/><circle cx="12" cy="18" r="6" fill="#FFFFFF"/><circle cx="28" cy="18" r="6" fill="#FFFFFF"/><circle cx="14" cy="9" r="6" fill="#FFFFFF"/><circle cx="26" cy="9" r="6" fill="#FFFFFF"/></svg>
+      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">
+        <rect x="18" y="20" width="4" height="40" fill="#558B2F"/>
+        <circle cx="20" cy="14" r="6" fill="#FFEB3B"/>
+        <circle cx="12" cy="18" r="6" fill="#FFFFFF"/>
+        <circle cx="28" cy="18" r="6" fill="#FFFFFF"/>
+        <circle cx="14" cy="9"  r="6" fill="#FFFFFF"/>
+        <circle cx="26" cy="9"  r="6" fill="#FFFFFF"/>
+      </svg>
     </div>
     <div class="forest-flower" style="right:30%; animation-delay:-2s;">
-      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="20" width="4" height="40" fill="#558B2F"/><circle cx="20" cy="14" r="6" fill="#FFEB3B"/><circle cx="12" cy="18" r="6" fill="#BA68C8"/><circle cx="28" cy="18" r="6" fill="#BA68C8"/><circle cx="14" cy="9" r="6" fill="#BA68C8"/><circle cx="26" cy="9" r="6" fill="#BA68C8"/></svg>
+      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">
+        <rect x="18" y="20" width="4" height="40" fill="#558B2F"/>
+        <circle cx="20" cy="14" r="6" fill="#FFEB3B"/>
+        <circle cx="12" cy="18" r="6" fill="#BA68C8"/>
+        <circle cx="28" cy="18" r="6" fill="#BA68C8"/>
+        <circle cx="14" cy="9"  r="6" fill="#BA68C8"/>
+        <circle cx="26" cy="9"  r="6" fill="#BA68C8"/>
+      </svg>
     </div>
     <div class="forest-flower" style="right:6%; animation-delay:-3s;">
-      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="20" width="4" height="40" fill="#558B2F"/><circle cx="20" cy="14" r="6" fill="#FFEB3B"/><circle cx="12" cy="18" r="6" fill="#FF8A65"/><circle cx="28" cy="18" r="6" fill="#FF8A65"/><circle cx="14" cy="9" r="6" fill="#FF8A65"/><circle cx="26" cy="9" r="6" fill="#FF8A65"/></svg>
+      <svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">
+        <rect x="18" y="20" width="4" height="40" fill="#558B2F"/>
+        <circle cx="20" cy="14" r="6" fill="#FFEB3B"/>
+        <circle cx="12" cy="18" r="6" fill="#FF8A65"/>
+        <circle cx="28" cy="18" r="6" fill="#FF8A65"/>
+        <circle cx="14" cy="9"  r="6" fill="#FF8A65"/>
+        <circle cx="26" cy="9"  r="6" fill="#FF8A65"/>
+      </svg>
     </div>
 
-    <!-- Colinas decorativas en la parte inferior (2 capas para dar profundidad) -->
+    <!-- Colinas decorativas en la parte inferior (2 capas para profundidad) -->
     <div class="forest-hill" style="bottom:0; opacity:0.9;">
-      <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,100 C 200,180 400,20 720,80 C 1040,140 1240,40 1440,100 L1440,200 L0,200 Z" fill="#9CCC65"/></svg>
+      <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,100 C 200,180 400,20 720,80 C 1040,140 1240,40 1440,100 L1440,200 L0,200 Z" fill="#9CCC65"/>
+      </svg>
     </div>
     <div class="forest-hill" style="bottom:0;">
-      <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 C 240,160 480,0 760,60 C 1040,120 1280,40 1440,90 L1440,160 L0,160 Z" fill="#7CB342"/></svg>
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,80 C 240,160 480,0 760,60 C 1040,120 1280,40 1440,90 L1440,160 L0,160 Z" fill="#7CB342"/>
+      </svg>
     </div>
   </div>
+  <!-- Fin del fondo "bosque" -->
 
-  <!-- Botón "Home" flotante: solo el icono 🏠, esquina superior izquierda -->
+  <!-- Botón flotante de inicio (🏠) en la esquina superior izquierda -->
   <button class="nav-home-fab" onclick="showScreen('home')" aria-label="Home">🏠</button>
 
   <div class="container-responsive">
-    <!-- Encabezado: progreso (1/20), barra de progreso, badge del temporizador y estrellas -->
+
+    <!-- Encabezado: contador (1/N), barra de progreso, timer y estrellas -->
     <div class="game-header">
       <span class="progress-text" id="progressText">1/20</span>
       <div class="progress-bar-wrap">
         <div class="progress-bar-fill" id="progressBar" style="width:5%"></div>
       </div>
-      <!-- El badge del timer está oculto por defecto; se muestra solo si el
-           Timer está activado (ver startGame() y updateTimerDisplay() en JS) -->
-      <span class="timer-badge" id="timerBadge" style="display:none">⏱️ <span id="timerValue">0:00</span></span>
+      <!-- Badge del timer: oculto por defecto; visible solo si el timer está activado -->
+      <span class="timer-badge" id="timerBadge" style="display:none">
+        ⏱️ <span id="timerValue">0:00</span>
+      </span>
       <span class="stars-badge" id="starsBadge">⭐ 0</span>
     </div>
-    <!-- Área principal: emoji de la palabra + espacios (slots) + letras desordenadas -->
+
+    <!-- Área principal: emoji + slots + letras -->
     <div class="game-area">
-      <!-- El emoji de la palabra actual se inserta aquí con JS (loadWord) -->
+
+      <!-- Marco circular del emoji (se rellena dinámicamente en loadWord()) -->
       <div class="emoji-frame">
         <div class="word-emoji" id="wordEmoji">🐝</div>
       </div>
-      <!-- Los espacios vacíos para armar la palabra se generan dinámicamente (loadWord) -->
+
+      <!-- Slots vacíos (se generan en loadWord() según la longitud de la palabra) -->
       <div class="slots" id="slots"></div>
-      <!-- Las letras desordenadas (botones) se generan dinámicamente (loadWord) -->
+
+      <!-- Letras desordenadas (se generan en loadWord()) -->
       <div class="letters" id="letters"></div>
+
     </div>
-    <!-- Navegación: flecha roja (palabra anterior) y flecha verde (palabra siguiente) -->
+
+    <!-- Navegación: ← (anterior) y → (siguiente) -->
     <div class="game-nav">
       <button class="nav-arrow-btn nav-prev" onclick="prevWord()" aria-label="Previous word">←</button>
       <button class="nav-arrow-btn nav-next" onclick="nextWord()" aria-label="Next word">→</button>
     </div>
+
   </div>
 </div>
 
 <!-- ==========================================================================
      PANTALLA 4: COMPLETE ("Amazing Work!")
-     id="complete" - Se muestra al terminar las 20 palabras de la sesión,
-     con un resumen de estadísticas (ver función nextWord() en JS).
+     Resumen de la sesión al terminar todas las palabras.
+     Los valores se llenan con nextWord() en app.js.
      ========================================================================== -->
 <div class="screen" id="complete">
   <div class="container-responsive">
     <div class="complete-content">
       <div class="complete-trophy">🏆</div>
       <h1 class="complete-title">Amazing Work!</h1>
-      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:clamp(0.95rem,1.2vw,1.3rem)">You finished the session!</p>
-      <!-- Estos 4 valores se llenan con JS al terminar la sesión (función nextWord) -->
+      <p style="color:var(--text-muted);margin-bottom:1rem;font-size:clamp(0.95rem,1.2vw,1.3rem)">
+        You finished the session!
+      </p>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-num" id="cmpWords">0</div><div class="stat-label">Words Done</div></div>
         <div class="stat-card"><div class="stat-num" id="cmpStars">0</div><div class="stat-label">Stars Earned</div></div>
@@ -879,7 +405,7 @@
         <div class="stat-card"><div class="stat-num" id="cmpTime">0s</div><div class="stat-label">Avg. Time</div></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem;width:100%">
-        <button class="btn btn-primary" onclick="showSelector()">🎮 Play Again</button>
+        <button class="btn btn-primary"   onclick="showSelector()">🎮 Play Again</button>
         <button class="btn btn-secondary" onclick="showScreen('home')">🏠 Home</button>
       </div>
     </div>
@@ -888,50 +414,62 @@
 
 <!-- ==========================================================================
      PANTALLA 5: ADMIN ("Manage Words")
-     id="admin" - Panel para administrar el banco de palabras:
+     Panel para gestionar el banco de palabras:
      agregar manualmente, importar desde Excel, ver y eliminar palabras.
      ========================================================================== -->
 <div class="screen" id="admin">
   <div class="container-responsive">
+
     <div class="admin-header">
       <button class="nav-btn" onclick="showScreen('home')">← Home</button>
       <span class="admin-title">⚙️ Manage Words</span>
     </div>
+
     <div class="admin-body">
-      <!-- En escritorio (>=1024px) esto se divide en 2 columnas: izquierda=formularios, derecha=lista -->
+      <!-- En escritorio (≥1024px) se divide en 2 columnas mediante admin-grid -->
       <div class="admin-grid">
-        <!-- COLUMNA IZQUIERDA: formularios para agregar/importar palabras -->
+
+        <!-- COLUMNA IZQUIERDA: formularios -->
         <div class="admin-left">
-          <!-- Panel "Add Word": agrega una palabra individual al banco (función addWord) -->
+
+          <!-- Panel "Add Word": agrega una palabra individual (addWord() en app.js) -->
           <div class="panel">
             <div class="panel-title">➕ Add Word</div>
             <div class="form-row" style="margin-bottom:0.75rem">
               <input class="input-field emoji-input" id="newEmoji" placeholder="😀" maxlength="4">
-              <input class="input-field" id="newWord" placeholder="Word (e.g. BEE)" style="text-transform:uppercase">
-              <!-- Para agregar una nueva categoría disponible al crear palabras manualmente,
-                   agrega una nueva <option> aquí -->
+              <input class="input-field" id="newWord" placeholder="Word (e.g. BEE)"
+                     style="text-transform:uppercase">
+              <!--
+                Para agregar una nueva categoría disponible en el formulario,
+                añade una nueva <option> aquí:
+                <option value="MiCategoria">MiCategoria</option>
+              -->
               <select class="select-field" id="newCat">
                 <option value="Camila">👧 Camila</option>
                 <option value="Sebas">👦 Sebastian</option>
               </select>
             </div>
-            <button class="btn btn-success btn-sm" onclick="addWord()" style="width:100%">Add Word</button>
+            <button class="btn btn-success btn-sm" onclick="addWord()" style="width:100%">
+              Add Word
+            </button>
           </div>
 
-          <!-- Panel "Import from Excel": permite subir un archivo .xlsx/.xls (función importExcel) -->
+          <!-- Panel "Import from Excel" (importExcel() en app.js) -->
           <div class="panel">
             <div class="panel-title">📤 Import from Excel</div>
-            <!-- Al hacer clic en esta área, se abre el selector de archivos oculto de abajo -->
+            <!-- Área clicable que activa el input de archivo oculto -->
             <div class="import-area" onclick="document.getElementById('xlsxFile').click()">
               <div class="import-icon">📊</div>
               <div style="font-weight:700;margin-bottom:4px">Click to import .xlsx / .xls</div>
-              <div class="import-text">Column A: Emoji — Column B: Word — Column C: Category (optional)</div>
+              <div class="import-text">
+                Column A: Emoji — Column B: Word — Column C: Category (optional)
+              </div>
             </div>
-            <!-- Input de archivo real, oculto (display:none); se activa con el clic de arriba -->
-            <input type="file" id="xlsxFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+            <!-- Input de archivo oculto -->
+            <input type="file" id="xlsxFile" accept=".xlsx,.xls"
+                   style="display:none" onchange="importExcel(event)">
 
-            <!-- Tabla de ejemplo: muestra cómo deben organizarse las columnas del Excel
-                 (A=Emoji, B=Word, C=Category) con 3 filas de ejemplo -->
+            <!-- Tabla de ejemplo del formato Excel esperado -->
             <div class="excel-example">
               <div class="excel-example-label">Example file layout</div>
               <table class="excel-table">
@@ -947,686 +485,74 @@
               </table>
             </div>
           </div>
-        </div>
 
-        <!-- COLUMNA DERECHA: lista del banco de palabras con buscador -->
+        </div>
+        <!-- Fin columna izquierda -->
+
+        <!-- COLUMNA DERECHA: lista del banco de palabras -->
         <div class="admin-right">
           <div class="panel">
-            <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+            <div class="panel-title"
+                 style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+              <!-- El número entre paréntesis muestra palabras ÚNICAS (sin contar duplicados por categoría) -->
               <span>📚 Word Bank (<span id="wordCount">0</span>)</span>
-              <!-- Buscador: filtra la lista en vivo mientras se escribe (función renderWordList) -->
-              <input class="input-field" id="searchWords" placeholder="🔍 Search..." style="width:200px;flex:none" oninput="renderWordList()">
+              <!-- Buscador en vivo -->
+              <input class="input-field" id="searchWords" placeholder="🔍 Search..."
+                     style="width:200px;flex:none" oninput="renderWordList()">
             </div>
-            <!-- La lista de palabras (con botón de eliminar cada una) se genera con JS (renderWordList) -->
+            <!-- Lista generada dinámicamente en renderWordList() (app.js) -->
             <ul class="word-list" id="wordList"></ul>
           </div>
         </div>
+        <!-- Fin columna derecha -->
+
       </div>
     </div>
+
   </div>
 </div>
 
 <!-- ==========================================================================
      PANTALLA 6: STATS ("My Stats")
-     id="stats" - Muestra el progreso acumulado del estudiante: palabras
-     completadas, estrellas, precisión, sesiones, medallas y logros.
-     Todos los valores se llenan con JS (función renderStats).
+     Estadísticas acumuladas: palabras, estrellas, precisión, sesiones,
+     medallas y logros. Se rellena con renderStats() en app.js.
      ========================================================================== -->
 <div class="screen" id="stats">
   <div class="container-responsive">
+
     <div class="stats-header">
       <button class="nav-btn-sm" onclick="showScreen('home')" aria-label="Home">🏠</button>
       <span>📊 My Stats</span>
     </div>
+
     <div style="width:100%">
-      <!-- 4 tarjetas con los totales generales -->
+      <!-- 4 tarjetas con totales globales -->
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-num" id="stTotalWords">0</div><div class="stat-label">Words Completed</div></div>
         <div class="stat-card"><div class="stat-num" id="stTotalStars">0</div><div class="stat-label">Total Stars ⭐</div></div>
         <div class="stat-card"><div class="stat-num" id="stAccuracy">0%</div><div class="stat-label">Overall Accuracy</div></div>
         <div class="stat-card"><div class="stat-num" id="stSessions">0</div><div class="stat-label">Sessions Played</div></div>
       </div>
-      <!-- Medallas según el desempeño (se generan en renderStats) -->
+
+      <!-- Medallas según desempeño (generadas en renderStats()) -->
       <div class="medals-row" id="medalsRow"></div>
-      <!-- Lista de logros desbloqueados/bloqueados (constante ACHIEVEMENTS en JS) -->
+
+      <!-- Lista de logros (generada en renderStats()) -->
       <div class="panel" style="margin-top:1rem">
         <div class="panel-title">🏆 Achievements</div>
         <div id="achievementsList"></div>
       </div>
-      <!-- Botón para borrar todas las estadísticas guardadas (función resetStats) -->
-      <button class="btn btn-danger btn-sm" onclick="resetStats()" style="margin-top:1rem">🗑 Reset Stats</button>
+
+      <!-- Botón para resetear estadísticas (resetStats() en app.js) -->
+      <button class="btn btn-danger btn-sm" onclick="resetStats()" style="margin-top:1rem">
+        🗑 Reset Stats
+      </button>
     </div>
+
   </div>
 </div>
 
-<script>
-// ==========================================================================
-// SECCIÓN: DATOS Y CONFIGURACIÓN GENERAL
-// Aquí se definen los logros, mensajes de éxito y el banco de palabras
-// por defecto. Modifica estas constantes para cambiar el contenido de la app.
-// ==========================================================================
-
-// Lista de logros/medallas que el estudiante puede desbloquear.
-// Cada uno tiene: id (identificador interno), icon (emoji), label (texto)
-// y req = función que recibe las estadísticas (s) y devuelve true/false
-// según si el logro fue alcanzado.
-// Para AGREGAR un nuevo logro, copia una línea y cambia id/icon/label/condición.
-const ACHIEVEMENTS = [
-  { id:'first', icon:'🥇', label:'First Word!', req: s => s.totalWords >= 1 },
-  { id:'ten', icon:'🔟', label:'10 Words', req: s => s.totalWords >= 10 },
-  { id:'fifty', icon:'5️⃣0️⃣', label:'50 Words', req: s => s.totalWords >= 50 },
-  { id:'hundred', icon:'💯', label:'100 Words', req: s => s.totalWords >= 100 },
-  { id:'stars10', icon:'⭐', label:'10 Stars', req: s => s.totalStars >= 10 },
-  { id:'stars50', icon:'🌟', label:'50 Stars', req: s => s.totalStars >= 50 },
-  { id:'perfect', icon:'💎', label:'Perfect Session', req: s => s.perfectSessions >= 1 },
-];
-
-// Mensajes que aparecen al completar correctamente una palabra (overlay de éxito).
-// Se elige uno al azar cada vez. Para cambiar/agregar mensajes, edita esta lista.
-const SUCCESS_MSGS = ['Great Job! 🎉','Excellent! 🌟','Amazing! 🚀','Well Done! 👏','Superstar! ⭐','Fantastic! 🎊','Brilliant! 💡'];
-
-// Banco de palabras por defecto (se usa la primera vez que se abre la app,
-// o si el usuario borra todo el banco). Cada palabra tiene: emoji, word (la
-// palabra en inglés, en mayúsculas) y cat (categoría).
-// Para AGREGAR palabras por defecto, copia una línea con el mismo formato.
-// (También se pueden agregar palabras desde la pantalla "Manage Words")
-const DEFAULT_WORDS = [
-  {emoji:'🐱', word:'CAT', cat:'Camila'},
-  {emoji:'🎩', word:'HAT', cat:'Camila'},
-  {emoji:'🦇', word:'BAT', cat:'Camila'},
-  {emoji:'🧢', word:'CAP', cat:'Camila'},
-  {emoji:'🐀', word:'RAT', cat:'Camila'},
-  {emoji:'🎒', word:'BAG', cat:'Camila'},
-  {emoji:'🌀', word:'FAN', cat:'Camila'},
-  {emoji:'🍳', word:'PAN', cat:'Camila'},
-  {emoji:'🚐', word:'VAN', cat:'Camila'},
-  {emoji:'👨', word:'DAD', cat:'Camila'},
-  {emoji:'🍓', word:'JAM', cat:'Camila'},
-  {emoji:'🗺️', word:'MAP', cat:'Camila'},
-  {emoji:'🔴', word:'RED', cat:'Camila'},
-  {emoji:'🛏️', word:'BED', cat:'Camila'},
-  {emoji:'🖊️', word:'PEN', cat:'Camila'},
-  {emoji:'🥅', word:'NET', cat:'Camila'},
-  {emoji:'🦵', word:'LEG', cat:'Camila'},
-  {emoji:'💧', word:'WET', cat:'Camila'},
-  {emoji:'🐔', word:'HEN', cat:'Camila'},
-  {emoji:'🔟', word:'TEN', cat:'Camila'},
-  {emoji:'✈️', word:'JET', cat:'Camila'},
-  {emoji:'🐷', word:'PIG', cat:'Camila'},
-  {emoji:'🐘', word:'BIG', cat:'Camila'},
-  {emoji:'🪑', word:'SIT', cat:'Camila'},
-  {emoji:'⛏️', word:'DIG', cat:'Camila'},
-  {emoji:'🔧', word:'FIX', cat:'Camila'},
-  {emoji:'👄', word:'LIP', cat:'Camila'},
-  {emoji:'📌', word:'PIN', cat:'Camila'},
-  {emoji:'🐶', word:'DOG', cat:'Camila'},
-  {emoji:'☀️', word:'HOT', cat:'Camila'},
-  {emoji:'🦊', word:'FOX', cat:'Camila'},
-  {emoji:'👩', word:'MOM', cat:'Camila'},
-  {emoji:'📦', word:'BOX', cat:'Camila'},
-  {emoji:'🐰', word:'HOP', cat:'Camila'},
-  {emoji:'🙂', word:'MOP', cat:'Camila'},
-  {emoji:'🍲', word:'POT', cat:'Camila'},
-  {emoji:'🐞', word:'BUG', cat:'Camila'},
-  {emoji:'🌞', word:'SUN', cat:'Camila'},
-  {emoji:'🥤', word:'CUP', cat:'Camila'},
-  {emoji:'🏃', word:'RUN', cat:'Camila'}
-];
-
-// ==========================================================================
-// VARIABLES DE ESTADO (se usan/actualizan mientras el usuario navega y juega)
-// ==========================================================================
-let words = [];                  // Banco de palabras actual (cargado desde localStorage o DEFAULT_WORDS)
-let stats = { totalWords:0, totalStars:0, sessions:0, correctFirst:0, attempts:0, perfectSessions:0, avgTime:0, timeSamples:0 }; // Estadísticas acumuladas (pantalla "My Stats")
-let gameWords = [], gameIdx = 0, gameStars = 0, gameCorrectFirst = 0, gameAttempts = 0; // Datos de la sesión de juego actual
-let currentSlots = [], selectedCat = 'all', selectedLevel = 'all'; // Letras colocadas y filtros elegidos (Categoría/Nivel)
-let wordStartTime = 0, sessionStartTime = 0; // Marcas de tiempo para calcular duración
-let hintUsed = false; // Si ya se usó una pista en la palabra actual
-let timerEnabled = false, timerSeconds = 60, selectedTimerOption = '1'; // Configuración del temporizador
-let wordCountCustomEnabled = false; // Si está activo, usa un número personalizado de palabras
-let timerInterval = null, timeRemaining = 0; // Control del conteo regresivo activo
-
-// ==========================================================================
-// ALMACENAMIENTO (localStorage): guarda el banco de palabras y las
-// estadísticas en el navegador para que persistan entre sesiones.
-// ==========================================================================
-function saveData() {
-  try { localStorage.setItem('sbk_words', JSON.stringify(words)); localStorage.setItem('sbk_stats', JSON.stringify(stats)); } catch(e){}
-}
-function loadData() {
-  try {
-    const w = localStorage.getItem('sbk_words');
-    const saved = w ? JSON.parse(w) : [];
-    // Fusionar DEFAULT_WORDS con lo guardado en localStorage:
-    // Las palabras del código se agregan automáticamente si aún no existen
-    // (se compara por la palabra en mayúsculas). Así, al agregar palabras
-    // al DEFAULT_WORDS del código, siempre aparecerán en el banco.
-    const savedWords = new Set(saved.map(x => x.word.toUpperCase()));
-    const newFromCode = DEFAULT_WORDS.filter(d => !savedWords.has(d.word.toUpperCase()));
-    words = [...saved, ...newFromCode];
-    if(newFromCode.length > 0) saveData(); // Guardar la fusión para que persista
-    const s = localStorage.getItem('sbk_stats'); if(s) stats = JSON.parse(s);
-  } catch(e) { words = JSON.parse(JSON.stringify(DEFAULT_WORDS)); }
-}
-
-// ==========================================================================
-// VOZ (Text-To-Speech): usa la API del navegador para pronunciar palabras
-// en inglés. "rate" controla la velocidad (1 = normal).
-// ==========================================================================
-function speak(text, rate=1, onDone=null) {
-  if (!window.speechSynthesis) { if(onDone) onDone(); return; }
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = rate; u.pitch = 1.1;
-  if(onDone) u.onend = onDone;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
-// ==========================================================================
-// NAVEGACIÓN ENTRE PANTALLAS
-// showScreen(id) oculta todas las pantallas y muestra solo la indicada
-// (home, selector, game, complete, admin, stats). También ejecuta acciones
-// extra según la pantalla: detener el timer, refrescar listas/estadísticas, etc.
-// ==========================================================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id!=='game') stopWordTimer(); // Si salimos del juego, detenemos el temporizador
-  if(id==='admin') { renderWordList(); }   // Al entrar a Admin, refresca la lista de palabras
-  if(id==='stats') { renderStats(); }      // Al entrar a Stats, refresca las estadísticas
-  if(id==='home') { updateHomeCount(); }   // Al volver a Home, actualiza el contador de palabras
-}
-
-// Actualiza el texto "X words in the bank" en la pantalla de inicio
-function updateHomeCount() {
-  document.getElementById('wordCountBadge').textContent = words.length + ' words in the bank';
-}
-
-// ==========================================================================
-// PANTALLA SELECTOR ("Choose your game")
-// ==========================================================================
-// Prepara la pantalla del selector: genera los "chips" de Categoría
-// dinámicamente según las categorías existentes en el banco de palabras.
-function showSelector() {
-  showScreen('selector');
-  const cats = ['all', ...new Set(words.map(w=>w.cat))];
-  const cc = document.getElementById('catChips');
-  cc.innerHTML = cats.map(c=>`<div class="chip ${c==='all'?'selected chip-all':''}" data-cat="${c}" onclick="selectCat(this)">${c==='all'?'⭐ All':c}</div>`).join('');
-  updateWordCountInfo();
-}
-// Se ejecuta al hacer clic en un chip de Categoría: marca el seleccionado y guarda el filtro
-function selectCat(el) { document.querySelectorAll('#catChips .chip').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedCat=el.dataset.cat; updateWordCountInfo(); }
-// Se ejecuta al hacer clic en un chip de Nivel: marca el seleccionado y guarda el filtro
-function selectLevel(el) { document.querySelectorAll('[data-level]').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); selectedLevel=el.dataset.level; updateWordCountInfo(); }
-
-// ==========================================================================
-// CONFIGURACIÓN DEL TEMPORIZADOR (pantalla Selector)
-// ==========================================================================
-// Se ejecuta al activar/desactivar el interruptor del Timer.
-// Activa o "apaga" visualmente las opciones de tiempo (1/5/10 min/Custom).
-function onTimerToggle() {
-  timerEnabled = document.getElementById('timerEnabled').checked;
-  const opts = document.getElementById('timerOptions');
-  opts.classList.toggle('disabled', !timerEnabled);
-}
-// Se ejecuta al elegir una opción de tiempo (1 min / 5 min / 10 min / Custom).
-// Si se elige "Custom", muestra los campos de minutos y segundos personalizados.
-function selectTimer(el) {
-  document.querySelectorAll('#timerOptions .chip').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedTimerOption = el.dataset.timer;
-  const customRow = document.getElementById('timerCustomRow');
-  if(selectedTimerOption==='custom') {
-    customRow.classList.remove('hidden');
-  } else {
-    customRow.classList.add('hidden');
-  }
-}
-// Calcula cuántos segundos durará el temporizador por palabra, según la
-// opción elegida (1/5/10 min, o el valor personalizado de minutos+segundos).
-function getTimerSeconds() {
-  if(selectedTimerOption==='custom') {
-    const m = parseInt(document.getElementById('timerCustomMinutes').value, 10);
-    const s = parseInt(document.getElementById('timerCustomSeconds').value, 10);
-    const mins = isNaN(m) ? 0 : Math.max(0, m);
-    const secs = isNaN(s) ? 0 : Math.max(0, Math.min(59, s));
-    const total = mins*60 + secs;
-    return total < 1 ? 1 : total; // Mínimo 1 segundo, para evitar un timer de 0
-  }
-  return parseInt(selectedTimerOption, 10) * 60; // 1/5/10 minutos -> segundos
-}
-
-// ==========================================================================
-// CANTIDAD DE PALABRAS (pantalla Selector)
-// ==========================================================================
-// Se ejecuta al activar/desactivar el toggle de Word Count.
-function onWordCountToggle() {
-  wordCountCustomEnabled = document.getElementById('wordCountCustomEnabled').checked;
-  const customRow = document.getElementById('wordCountCustomRow');
-  customRow.classList.toggle('hidden', !wordCountCustomEnabled);
-  updateWordCountInfo();
-}
-
-// Actualiza el texto informativo según los filtros y el toggle activo.
-// Se llama desde showSelector() y cuando cambia categoría/nivel.
-function updateWordCountInfo() {
-  const pool = words.filter(w => {
-    const catOk = selectedCat==='all' || w.cat===selectedCat;
-    const lvlOk = selectedLevel==='all' || getLevel(w.word)===selectedLevel;
-    return catOk && lvlOk;
-  });
-  const total = pool.length;
-  const info = document.getElementById('wordCountInfo');
-  if(!info) return;
-  if(wordCountCustomEnabled) {
-    info.textContent = total + ' words available with current filters';
-  } else {
-    info.textContent = 'All ' + total + ' available word' + (total!==1?'s':'') + ' will be used';
-  }
-}
-
-// ==========================================================================
-// LÓGICA DEL JUEGO
-// ==========================================================================
-// Determina el nivel de dificultad de una palabra según su longitud:
-// 3-4 letras = beginner, 5-7 = intermediate, 8+ = advanced.
-// Para CAMBIAR estas reglas de nivel, modifica los números aquí.
-function getLevel(word) {
-  const l=word.replace(/\s/g,'').length;
-  if(l<=4) return 'beginner';
-  if(l<=7) return 'intermediate';
-  return 'advanced';
-}
-
-// Se ejecuta al presionar "Play!" en el selector.
-// 1) Filtra el banco de palabras según Categoría y Nivel elegidos.
-// 2) Si no hay palabras que cumplan, muestra un aviso (toast) y se detiene.
-// 3) Mezcla las palabras y usa todas (o el número custom si está activo).
-// 4) Reinicia los contadores de la sesión (estrellas, aciertos, intentos).
-// 5) Calcula la duración del temporizador y muestra/oculta su badge.
-// 6) Pasa a la pantalla de juego y carga la primera palabra.
-function startGame() {
-  let pool = words.filter(w => {
-    const catOk = selectedCat==='all' || w.cat===selectedCat;
-    const lvlOk = selectedLevel==='all' || getLevel(w.word)===selectedLevel;
-    return catOk && lvlOk;
-  });
-  if(pool.length===0) { showToast('No words match the filter! Try different settings.'); return; }
-  // Si Word Count custom está activo, tomar ese número; si no, usar todas las disponibles
-  let limit = pool.length;
-  if(wordCountCustomEnabled) {
-    const customVal = parseInt(document.getElementById('wordCountCustomValue').value, 10);
-    if(!isNaN(customVal) && customVal > 0) limit = Math.min(customVal, pool.length);
-  }
-  gameWords = shuffle([...pool]).slice(0, limit);
-  gameIdx = 0; gameStars = 0; gameCorrectFirst = 0; gameAttempts = 0;
-  sessionStartTime = Date.now();
-  timerSeconds = getTimerSeconds();
-  document.getElementById('timerBadge').style.display = timerEnabled ? 'flex' : 'none';
-  stats.sessions++;
-  saveData();
-  showScreen('game');
-  loadWord();
-}
-
-// Mezcla aleatoriamente los elementos de un arreglo (algoritmo Fisher-Yates).
-// Se usa tanto para mezclar las palabras de la sesión como las letras de cada palabra.
-function shuffle(arr) {
-  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;
-}
-
-// Carga la palabra actual (gameWords[gameIdx]) en pantalla:
-// - Muestra el emoji correspondiente
-// - Actualiza el texto y la barra de progreso (1/20, 2/20, ...)
-// - Crea los espacios vacíos (slots) según el número de letras
-// - Crea los botones de letras desordenadas (mezcladas con shuffle)
-// - Inicia el temporizador de la palabra (si está activado)
-function loadWord() {
-  hintUsed = false;
-  wordStartTime = Date.now();
-  const w = gameWords[gameIdx];
-  const letters = w.word.replace(/\s/g,'').toUpperCase().split('');
-  currentSlots = new Array(letters.length).fill(null);
-
-  document.getElementById('wordEmoji').textContent = w.emoji;
-  document.getElementById('progressText').textContent = (gameIdx+1)+' / '+gameWords.length;
-  document.getElementById('progressBar').style.width = Math.round((gameIdx/gameWords.length)*100)+'%';
-  document.getElementById('starsBadge').textContent = '⭐ '+gameStars;
-
-  // Crea los espacios vacíos (uno por cada letra de la palabra)
-  const slotsEl = document.getElementById('slots');
-  slotsEl.innerHTML = letters.map((_,i)=>`<div class="slot empty" data-idx="${i}" onclick="removeFromSlot(${i})"></div>`).join('');
-
-  // Crea los botones de letras en orden aleatorio DIFERENTE al orden original.
-  // Se reintenta el shuffle hasta conseguir un orden distinto (máx. 20 intentos).
-  let mixed = shuffle([...letters]);
-  let attempts = 0;
-  while(mixed.join('') === letters.join('') && attempts < 20) {
-    mixed = shuffle([...letters]);
-    attempts++;
-  }
-  const lettersEl = document.getElementById('letters');
-  lettersEl.innerHTML = mixed.map((l,i)=>`<button class="letter-btn" data-li="${i}" onclick="placeLetter(this,'${l}')">${l}</button>`).join('');
-
-  startWordTimer();
-}
-
-// ==========================================================================
-// TEMPORIZADOR (cuenta regresiva por palabra)
-// ==========================================================================
-// Inicia la cuenta regresiva para la palabra actual (si timerEnabled=true).
-// Cada segundo descuenta 1 y actualiza el badge; al llegar a 0, detiene el
-// timer y llama a onTimeUp().
-function startWordTimer() {
-  stopWordTimer();
-  if(!timerEnabled) return;
-  timeRemaining = timerSeconds;
-  updateTimerDisplay();
-  timerInterval = setInterval(()=>{
-    timeRemaining--;
-    updateTimerDisplay();
-    if(timeRemaining<=0) {
-      stopWordTimer();
-      onTimeUp();
-    }
-  }, 1000);
-}
-
-// Detiene el temporizador activo (se llama al responder, cambiar de
-// pantalla, avanzar/retroceder palabra, etc.)
-function stopWordTimer() {
-  if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-
-// Actualiza el texto del badge del temporizador (formato m:ss).
-// Si quedan 10 segundos o menos, agrega la clase "warning" (badge rojo y pulsante).
-function updateTimerDisplay() {
-  const badge = document.getElementById('timerBadge');
-  const valueEl = document.getElementById('timerValue');
-  if(!timerEnabled) { badge.style.display='none'; return; }
-  badge.style.display='flex';
-  const m = Math.floor(timeRemaining/60);
-  const s = timeRemaining%60;
-  valueEl.textContent = m+':'+String(s).padStart(2,'0');
-  badge.classList.toggle('warning', timeRemaining<=10);
-}
-
-// Se ejecuta cuando el tiempo de la palabra actual llega a 0:
-// muestra el aviso "Time's up!", lo anuncia por voz, y pasa a la
-// siguiente palabra después de 1.2 segundos.
-function onTimeUp() {
-  showTimeUpBanner();
-  speak("Time's up", 1);
-  setTimeout(()=>{ nextWord(); }, 1200);
-}
-
-// Muestra el aviso "Time's up!" deslizándolo desde arriba (clase "show")
-// y lo oculta automáticamente 1.6 segundos después.
-function showTimeUpBanner() {
-  const banner = document.getElementById('timeupBanner');
-  banner.classList.add('show');
-  setTimeout(()=>banner.classList.remove('show'), 1600);
-}
-
-// ==========================================================================
-// JUEGO: COLOCAR LETRAS Y VALIDAR LA RESPUESTA
-// ==========================================================================
-// Se ejecuta al tocar/clickear una letra desordenada:
-// - La coloca en el primer espacio (slot) vacío disponible
-// - Deshabilita el botón de esa letra (para que no se use 2 veces)
-// - Pronuncia la letra en voz alta
-// - Si ya no quedan espacios vacíos, valida la respuesta (checkAnswer)
-function placeLetter(btn, letter) {
-  if(btn.disabled) return;
-  const emptyIdx = currentSlots.indexOf(null);
-  if(emptyIdx===-1) return;
-  currentSlots[emptyIdx] = {letter, btnEl:btn};
-  btn.disabled = true;
-  const slot = document.querySelector(`.slot[data-idx="${emptyIdx}"]`);
-  slot.textContent = letter;
-  slot.classList.remove('empty');
-  slot.classList.add('filled');
-  // Si es la última letra: esperar a que la letra termine de sonar (evento onend)
-  // y luego validar. Así la letra siempre se escucha completa antes del overlay.
-  if(!currentSlots.includes(null)) {
-    speak(letter.toLowerCase(), 1.1, checkAnswer);
-  } else {
-    speak(letter.toLowerCase(), 1.1);
-  }
-}
-
-// Se ejecuta al tocar/clickear un espacio (slot) que tiene una letra:
-// quita esa letra, vuelve a habilitar su botón, y reacomoda los espacios
-// restantes para que no queden huecos en medio.
-function removeFromSlot(idx) {
-  if(!currentSlots[idx]) return;
-  const {letter, btnEl} = currentSlots[idx];
-  currentSlots[idx] = null;
-  btnEl.disabled = false;
-  const slot = document.querySelector(`.slot[data-idx="${idx}"]`);
-  slot.textContent = '';
-  slot.classList.add('empty');
-  slot.classList.remove('filled','correct','wrong');
-  // Vuelve a dibujar todos los espacios según el estado actual de currentSlots
-  const letters = gameWords[gameIdx].word.replace(/\s/g,'').split('');
-  let used = 0;
-  for(let i=0;i<currentSlots.length;i++){
-    if(currentSlots[i]) {
-      const s=document.querySelector(`.slot[data-idx="${i}"]`);
-      s.textContent=currentSlots[i].letter;
-      s.classList.remove('empty'); s.classList.add('filled');
-    } else {
-      const s=document.querySelector(`.slot[data-idx="${i}"]`);
-      s.textContent=''; s.classList.add('empty'); s.classList.remove('filled');
-    }
-  }
-}
-
-// Botón "Clear": quita todas las letras colocadas, una por una (de derecha a izquierda)
-function clearAll() {
-  const letters = gameWords[gameIdx].word.replace(/\s/g,'').split('');
-  for(let i=currentSlots.length-1;i>=0;i--) {
-    if(currentSlots[i]) removeFromSlot(i);
-  }
-}
-
-// Se ejecuta automáticamente cuando se llenan todos los espacios.
-// Compara la respuesta armada con la palabra correcta:
-// - Si es CORRECTA: marca los espacios en verde, calcula estrellas ganadas
-//   (3 si no usó pista, 1 si usó pista), actualiza estadísticas globales
-//   (stats), guarda los datos y muestra la animación/overlay de éxito.
-// - Si es INCORRECTA: (ver más abajo) marca los espacios en rojo y los
-//   vuelve a dejar vacíos para reintentar.
-function checkAnswer() {
-  const w = gameWords[gameIdx];
-  const answer = currentSlots.map(s=>s?s.letter:'').join('');
-  const correct = w.word.replace(/\s/g,'').toUpperCase();
-  gameAttempts++;
-  if(answer===correct) {
-    // Respuesta CORRECTA: marca los espacios en verde
-    stopWordTimer();
-    document.querySelectorAll('.slot').forEach(s=>{ s.classList.remove('filled'); s.classList.add('correct'); });
-    const elapsed = (Date.now()-wordStartTime)/1000;
-    if(gameAttempts===1) gameCorrectFirst++;
-    const earnedStars = hintUsed ? 1 : 3; // 3 estrellas sin pista, 1 estrella si usó pista
-    gameStars += earnedStars;
-    stats.totalWords++;
-    stats.totalStars += earnedStars;
-    stats.correctFirst += (gameAttempts===1?1:0);
-    stats.attempts++;
-    stats.timeSamples = (stats.timeSamples||0)+1;
-    stats.avgTime = ((stats.avgTime||0)*(stats.timeSamples-1)+elapsed)/stats.timeSamples;
-    saveData();
-    document.getElementById('wordEmoji').classList.add('bounce');
-    speak(w.word, 0.85);
-    setTimeout(()=>showSuccess(w, earnedStars), 500);
-  } else {
-    document.querySelectorAll('.slot.filled').forEach(s=>s.classList.add('wrong'));
-    setTimeout(()=>{ document.querySelectorAll('.slot').forEach(s=>s.classList.remove('wrong')); }, 600);
-    clearAll();
-  }
-}
-
-// (Función useHint eliminada junto con el botón "Hint")
-
-function showSuccess(wordObj, earnedStars) {
-  const msgs = SUCCESS_MSGS;
-  document.getElementById('overlayEmoji').textContent = wordObj.emoji;
-  document.getElementById('overlayMessage').textContent = msgs[Math.floor(Math.random()*msgs.length)];
-  document.getElementById('overlayWord').textContent = wordObj.word;
-  const sr = document.getElementById('starsRow');
-  sr.innerHTML = Array(earnedStars).fill(0).map((_,i)=>`<span class="star" style="animation-delay:${i*0.15}s">⭐</span>`).join('');
-  launchConfetti();
-  document.getElementById('successOverlay').classList.add('show');
-}
-
-function launchConfetti() {
-  const wrap = document.getElementById('confettiWrap');
-  wrap.innerHTML = '';
-  const colors = ['#F5A623','#FF7043','#66BB6A','#42A5F5','#AB47BC','#EF5350'];
-  for(let i=0;i<30;i++){
-    const c=document.createElement('div');
-    c.className='confetti';
-    c.style.cssText=`left:${Math.random()*100}%;background:${colors[i%colors.length]};animation-duration:${1+Math.random()*1.5}s;animation-delay:${Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg)`;
-    wrap.appendChild(c);
-  }
-}
-
-function nextWord() {
-  document.getElementById('successOverlay').classList.remove('show');
-  document.getElementById('wordEmoji').classList.remove('bounce');
-  stopWordTimer();
-  gameIdx++;
-  if(gameIdx>=gameWords.length) {
-    // Session complete
-    const acc = gameAttempts>0 ? Math.round((gameCorrectFirst/gameWords.length)*100) : 0;
-    if(acc===100) stats.perfectSessions=(stats.perfectSessions||0)+1;
-    document.getElementById('cmpWords').textContent = gameWords.length;
-    document.getElementById('cmpStars').textContent = gameStars;
-    document.getElementById('cmpAccuracy').textContent = acc+'%';
-    document.getElementById('cmpTime').textContent = Math.round(stats.avgTime||0)+'s';
-    saveData();
-    showScreen('complete');
-  } else {
-    gameAttempts = 0;
-    loadWord();
-  }
-}
-
-function prevWord() {
-  if(gameIdx===0) return;
-  document.getElementById('successOverlay').classList.remove('show');
-  stopWordTimer();
-  gameIdx--;
-  gameAttempts=0;
-  loadWord();
-}
-
-// ===== ADMIN =====
-function addWord() {
-  const emoji = document.getElementById('newEmoji').value.trim() || '📝';
-  const wordRaw = document.getElementById('newWord').value.trim().toUpperCase();
-  const cat = document.getElementById('newCat').value;
-  if(!wordRaw) { showToast('Please enter a word!'); return; }
-  if(words.some(w=>w.word===wordRaw)) { showToast('Word already exists!'); return; }
-  words.push({emoji, word:wordRaw, cat});
-  saveData();
-  // Limpiar el buscador para que la palabra nueva sea visible en la lista
-  document.getElementById('searchWords').value = '';
-  renderWordList(wordRaw);
-  document.getElementById('newEmoji').value='';
-  document.getElementById('newWord').value='';
-  document.getElementById('newWord').focus();
-  // Hacer scroll hasta el final de la lista para ver la palabra recién agregada
-  const list = document.getElementById('wordList');
-  setTimeout(()=>{ list.lastElementChild && list.lastElementChild.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 80);
-  showToast('✅ Word added: '+wordRaw);
-}
-
-function deleteWord(idx) {
-  words.splice(idx,1);
-  saveData(); renderWordList();
-  showToast('🗑 Word removed');
-}
-
-function renderWordList(highlightWord) {
-  const search = (document.getElementById('searchWords').value||'').toLowerCase();
-  const list = document.getElementById('wordList');
-  document.getElementById('wordCount').textContent = words.length;
-  const filtered = words.map((w,i)=>({...w,i})).filter(w=>!search||w.word.toLowerCase().includes(search)||w.emoji.includes(search));
-  list.innerHTML = filtered.length===0 ? '<li style="text-align:center;padding:2rem;color:var(--text-muted)">No words found</li>' :
-    filtered.map(w=>`<li class="word-item${highlightWord&&w.word===highlightWord?' word-item-new':''}">
-      <span class="word-emoji-cell">${w.emoji}</span>
-      <span class="word-text">${w.word}</span>
-      <span class="word-cat">${w.cat}</span>
-      <button class="btn-sm btn-danger" onclick="deleteWord(${w.i})">✕</button>
-    </li>`).join('');
-}
-
-function importExcel(e) {
-  const file = e.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    try {
-      const wb = XLSX.read(ev.target.result, {type:'binary'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(ws, {header:1});
-      let added=0;
-      data.forEach(row=>{
-        if(!row[0]||!row[1]) return;
-        const emoji=String(row[0]).trim()||'📝';
-        const word=String(row[1]).trim().toUpperCase();
-        const cat=row[2]?String(row[2]).trim():'Other';
-        if(!words.some(w=>w.word===word)) { words.push({emoji,word,cat}); added++; }
-      });
-      saveData(); renderWordList();
-      showToast(`📊 Imported ${added} words!`);
-    } catch(err){ showToast('Error reading file'); }
-    e.target.value='';
-  };
-  reader.readAsBinaryString(file);
-}
-
-// ===== STATS =====
-function renderStats() {
-  document.getElementById('stTotalWords').textContent = stats.totalWords||0;
-  document.getElementById('stTotalStars').textContent = stats.totalStars||0;
-  const acc = stats.attempts>0 ? Math.round((stats.correctFirst||0)/stats.attempts*100) : 0;
-  document.getElementById('stAccuracy').textContent = acc+'%';
-  document.getElementById('stSessions').textContent = stats.sessions||0;
-
-  const medals = [
-    {icon:'🥇',label:'Gold',req:stats.totalStars>=100},
-    {icon:'🥈',label:'Silver',req:stats.totalStars>=50},
-    {icon:'🥉',label:'Bronze',req:stats.totalStars>=10},
-    {icon:'🏅',label:'Novice',req:stats.totalWords>=1},
-  ];
-  document.getElementById('medalsRow').innerHTML = medals.map(m=>`<div class="medal" style="${m.req?'':'opacity:0.3'}">
-    <div class="medal-icon">${m.icon}</div><div class="medal-label">${m.label}</div></div>`).join('');
-
-  const ach = document.getElementById('achievementsList');
-  ach.innerHTML = ACHIEVEMENTS.map(a=>`<div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);${a.req(stats)?'':'opacity:0.35'}">
-    <span style="font-size:1.5rem">${a.icon}</span>
-    <span style="font-weight:600;font-size:0.9rem">${a.label}</span>
-    ${a.req(stats)?'<span style="margin-left:auto;color:var(--green);font-size:0.8rem;font-weight:700">✓ Unlocked</span>':'<span style="margin-left:auto;color:var(--text-muted);font-size:0.8rem">Locked</span>'}
-  </div>`).join('');
-}
-
-function resetStats() {
-  if(!confirm('Reset all stats?')) return;
-  stats = {totalWords:0,totalStars:0,sessions:0,correctFirst:0,attempts:0,perfectSessions:0,avgTime:0,timeSamples:0};
-  saveData(); renderStats(); showToast('Stats reset');
-}
-
-// ===== TOAST =====
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2500);
-}
-
-// ===== INIT =====
-loadData(); updateHomeCount();
-</script>
+<!-- Lógica principal de la aplicación -->
+<script src="app.js"></script>
 </body>
 </html>
