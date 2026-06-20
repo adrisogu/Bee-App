@@ -164,7 +164,7 @@ const DEFAULT_WORDS = [
   { emoji:'🌱', word:'LAND',         cats:['Sebas'] },
   { emoji:'🏊', word:'SWIM',         cats:['Sebas'] },
   { emoji:'🟫', word:'DIRTY',        cats:['Sebas'] },
-  { emoji:'👦', word:'SHORT',        cats:['Sebas'] },
+  { emoji:'🩳', word:'SHORT',        cats:['Sebas'] },
   { emoji:'🦒', word:'TALL',         cats:['Sebas'] },
 ];
 
